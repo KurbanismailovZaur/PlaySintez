@@ -4,9 +4,9 @@ using UnityEngine;
 using System;
 
 [Serializable]
-public class EnergyManager : MonoBehaviour
+public class EnergyManager : Singleton<EnergyManager>
 {
-	#region Enums
+    #region Enums
     #endregion
 
     #region Delegates
@@ -19,6 +19,8 @@ public class EnergyManager : MonoBehaviour
     #endregion
 
     #region Fiedls
+    [SerializeField]
+    private Star _star;
     #endregion
 
     #region Events
@@ -33,32 +35,32 @@ public class EnergyManager : MonoBehaviour
     #region Event handlers
     public void LookVideo()
     {
-
+        _star.TakeEnergy(new Energy(Energy.EnergyType.Video, Energy.EnergyOwner.Me));
     }
 
     public void MakeComment()
     {
-
+        _star.TakeEnergy(new Energy(Energy.EnergyType.Comment, Energy.EnergyOwner.Me));
     }
 
-    public void Makelike()
+    public void MakeLike()
     {
-
+        _star.TakeEnergy(new Energy(Energy.EnergyType.Like, Energy.EnergyOwner.Me));
     }
 
     public void LookMyVideo()
     {
-
+        _star.TakeEnergy(new Energy(Energy.EnergyType.Video, Energy.EnergyOwner.Other));
     }
 
     public void MakeMeComment()
     {
-
+        _star.TakeEnergy(new Energy(Energy.EnergyType.Video, Energy.EnergyOwner.Other));
     }
 
-    public void MakeMelike()
+    public void MakeMeLike()
     {
-
+        _star.TakeEnergy(new Energy(Energy.EnergyType.Video, Energy.EnergyOwner.Other));
     }
     #endregion
 }
