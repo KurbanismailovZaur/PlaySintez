@@ -22,7 +22,6 @@ public class SelectableMonoBehaviour : MonoBehaviour, ISelectable
     #endregion
 
     #region Events
-    public static event Action<SelectableMonoBehaviour> Selected;
     #endregion
 
     #region Properties
@@ -34,10 +33,7 @@ public class SelectableMonoBehaviour : MonoBehaviour, ISelectable
     #region Methods
     public void OnSelect()
     {
-        if (Selected != null)
-        {
-            Selected.Invoke(this);
-        }
+
     }
 
     public Bounds? GetBounds()

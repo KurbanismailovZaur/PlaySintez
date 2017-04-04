@@ -19,10 +19,7 @@ public class CameraController : MonoBehaviour
     #endregion
 
     #region Fiedls
-    private bool _isMouseDown;
-    private bool _isMouseDownInViewport;
-
-    private Vector2 _mousePosition;
+    private bool _allowTranslation;
 
     [SerializeField]
     private float _moveDistancePerPixel = 1f;
@@ -54,53 +51,25 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        CalculateHorizontalPosition();
-        CalculateHeight();
         LerpCameraPosition();
     }
 
-    private void CalculateHorizontalPosition()
+    private void CalculateHorizontalPosition(Vector2 mouseDeltaPosition)
     {
-        if(Input.GetMouseButtonDown(0))
-        {
-            _isMouseDown = true;
-            _isMouseDownInViewport = !EventSystem.current.IsPointerOverGameObject();
-
-            _mousePosition = Input.mousePosition;
-        }
-
-        if(Input.GetMouseButtonUp(0))
-        {
-            _isMouseDown = false;
-            _isMouseDownInViewport = false;
-        }
-
-        if(_isMouseDown && _isMouseDownInViewport)
-        {
-            Vector2 deltaPosition = (Vector2)Input.mousePosition - _mousePosition;
-            _targetPosition -= new Vector3(deltaPosition.x, 0f, deltaPosition.y) * _moveDistancePerPixel;
-
-            _mousePosition = Input.mousePosition;
-        }
+        _targetPosition -= new Vector3(mouseDeltaPosition.x, 0f, mouseDeltaPosition.y) * _moveDistancePerPixel;
     }
 
-    private void CalculateHeight()
+    private void CalculateHeight(bool isMouseInViewport, float mouseScrollDelta)
     {
-        bool isMouseInViewport = !EventSystem.current.IsPointerOverGameObject();
-
         if(!isMouseInViewport)
         {
             return;
         }
 
-        float scrollValue = Input.mouseScrollDelta.y;
-        if(!Mathf.Approximately(scrollValue, 0f))
-        {
-            float height = _targetPosition.y;
-            height = Mathf.Clamp(height - scrollValue, _heightPositionMin, _heightPositionMax);
+        float height = _targetPosition.y;
+        height = Mathf.Clamp(height - mouseScrollDelta, _heightPositionMin, _heightPositionMax);
 
-            _targetPosition = new Vector3(_targetPosition.x, height, _targetPosition.z);
-        }
+        _targetPosition = new Vector3(_targetPosition.x, height, _targetPosition.z);
     }
 
     private void LerpCameraPosition()
@@ -110,5 +79,27 @@ public class CameraController : MonoBehaviour
     #endregion
 
     #region Event handlers
+    public void InputManager_MousePositionChanged(InputManager.MouseInformation mouseInfo)
+    {
+        if (_allowTranslation)
+        {
+            CalculateHorizontalPosition(mouseInfo.MouseDeltaPosition);
+        }
+    }
+
+    public void InputManager_MouseLeftButtonPressed(InputManager.MouseInformation mouseInfo)
+    {
+        _allowTranslation = mouseInfo.IsMouseInViewport;
+    }
+
+    public void InputManager_MouseLeftButtonReleased(InputManager.MouseInformation mouseInfo)
+    {
+        _allowTranslation = false;
+    }
+
+    public void InputManager_MouseScrollDeltaChanged(InputManager.MouseInformation mouseInfo)
+    {
+        CalculateHeight(mouseInfo.IsMouseInViewport, mouseInfo.MouseScrollDelta);
+    }
     #endregion
 }

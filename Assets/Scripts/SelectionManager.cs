@@ -52,8 +52,6 @@ public class SelectionManager : Singleton<SelectionManager>
     #region Methods
     private void Start()
     {
-        SelectableMonoBehaviour.Selected += (selectable) => { Selected = selectable; };
-
         _line = new VectorLine("SelectedLine", Enumerable.Repeat(Vector2.zero, 5).ToList(), 2f);
         _line.lineType = LineType.Continuous;
         _line.color = new Color32(255, 255, 0, 255);
@@ -129,5 +127,44 @@ public class SelectionManager : Singleton<SelectionManager>
     #endregion
 
     #region Event handlers
+    public void InputManager_MouseLeftButtonClicked(InputManager.MouseInformation mouseInfo)
+    {
+        if (!mouseInfo.IsMouseInViewport)
+        {
+            return;
+        }
+
+        Ray ray = Camera.main.ScreenPointToRay(mouseInfo.Position);
+        RaycastHit hitInfo;
+
+        // States:
+        // 0 - no raycast;
+        // 1 - raycast to non-selectable;
+        // 2 - raycast to selectable.
+        int raycastResult = 0;
+
+        if (Physics.Raycast(ray, out hitInfo, 64f))
+        {
+            raycastResult = 1;
+
+            if (hitInfo.collider.GetComponent<SelectableMonoBehaviour>() != null)
+            {
+                raycastResult = 2;
+            }
+        }
+
+        switch (raycastResult)
+        {
+            // No raycast or raycast to non-selectable.
+            case 0:
+            case 1:
+                Selected = null;
+                break;
+            // Raycast to selectable.
+            case 2:
+                Selected = hitInfo.collider.GetComponent<SelectableMonoBehaviour>();
+                break;
+        }
+    }
     #endregion
 }
