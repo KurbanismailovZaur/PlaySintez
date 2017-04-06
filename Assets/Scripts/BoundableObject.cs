@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class SelectableMonoBehaviour : MonoBehaviour, ISelectable
+public class BoundableObject : MonoBehaviour 
 {
     #region Enums
     #endregion
@@ -31,11 +29,6 @@ public class SelectableMonoBehaviour : MonoBehaviour, ISelectable
     #endregion
 
     #region Methods
-    public void OnSelect()
-    {
-
-    }
-
     public Bounds? GetBounds()
     {
         Bounds? bounds = null;

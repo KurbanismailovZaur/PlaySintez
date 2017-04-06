@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Energy 
+public class EnergyUnit 
 {
     #region Enums
     public enum EnergyType
@@ -42,7 +42,7 @@ public class Energy
     #endregion
 
     #region Constructors
-    public Energy(EnergyType energyType, EnergyOwner energyOwner)
+    public EnergyUnit(EnergyType energyType, EnergyOwner energyOwner)
     {
         _type = energyType;
         _owner = energyOwner;

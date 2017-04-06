@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(MeshRenderer))]
-public class Star : SelectableMonoBehaviour
+public class Star : BaseObject
 {
     #region Enums
     #endregion
@@ -21,9 +23,32 @@ public class Star : SelectableMonoBehaviour
         [ColorUsage(false, true, 0f, 1f, 0.125f, 3)]
         public Color emissionColor;
     }
+
+    public struct State
+    {
+        private byte _energy;
+        private float _energyProgress;
+        private byte _level;
+        private float _levelProgress;
+
+        public byte Energy { get { return _energy; } }
+        public float EnergyProgress { get { return _energyProgress; } }
+        public byte Level { get { return _level; } }
+        public float LevelProgress { get { return _levelProgress; } }
+
+        public State(byte energy, float energyProgress, byte level, float levelProgress)
+        {
+            _energy = energy;
+            _energyProgress = energyProgress;
+            _level = level;
+            _levelProgress = levelProgress;
+        }
+    }
     #endregion
 
     #region Classes
+    [Serializable]
+    public class StateChangedEvent : UnityEvent<State> { }
     #endregion
 
     #region Fiedls
@@ -46,9 +71,13 @@ public class Star : SelectableMonoBehaviour
     #endregion
 
     #region Events
+    public StateChangedEvent StateChanged;
     #endregion
 
     #region Properties
+    public byte Energy { get { return _energy; } }
+    public float EnergyProgress { get { return _energyProgress; } }
+
     public byte Level { get { return _level; } }
     public float LevelProgress { get { return _levelProgress; } }
     #endregion
@@ -60,14 +89,14 @@ public class Star : SelectableMonoBehaviour
         _material.EnableKeyword("_EMISSION");
     }
 
-    public void TakeEnergy(Energy energy)
+    public void TakeEnergy(EnergyUnit energy)
     {
         switch(energy.Owner)
         {
-            case Energy.EnergyOwner.Me:
+            case EnergyUnit.EnergyOwner.Me:
                 IncreaseStarEnergyProgress();
                 break;
-            case Energy.EnergyOwner.Other:
+            case EnergyUnit.EnergyOwner.Other:
                 IncreaseStarLevelProgress();
                 break;
         }
@@ -76,6 +105,8 @@ public class Star : SelectableMonoBehaviour
     private void IncreaseStarEnergyProgress()
     {
         _energyProgress += 1f / Mathf.Pow(_energy + 1, 2);
+
+        StateChanged.Invoke(GetState());
 
         if (_energyProgress >= 1f)
         {
@@ -97,6 +128,8 @@ public class Star : SelectableMonoBehaviour
         int index = Mathf.Clamp(_energy, 0, _colorsPerEnergy.Length - 1);
         _material.DOColor(_colorsPerEnergy[index].color, "_Color", _animationDuration).Play();
         _material.DOColor(_colorsPerEnergy[index].emissionColor, "_EmissionColor", _animationDuration).Play();
+
+        StateChanged.Invoke(GetState());
     }
 
     private void IncreaseStarLevelProgress()
@@ -108,7 +141,9 @@ public class Star : SelectableMonoBehaviour
 
         _levelProgress += 1f / Mathf.Pow(_level + 1, 2);
 
-        if(_levelProgress >= 1f)
+        StateChanged.Invoke(GetState());
+
+        if (_levelProgress >= 1f)
         {
             LevelUpStar();
         }
@@ -118,6 +153,13 @@ public class Star : SelectableMonoBehaviour
     {
         _levelProgress = 0f;
         _level += 1;
+
+        StateChanged.Invoke(GetState());
+    }
+
+    public State GetState()
+    {
+        return new State(_energy, _energyProgress, _level, _levelProgress);
     }
     #endregion
 

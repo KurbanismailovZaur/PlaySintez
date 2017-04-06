@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Vectrosity;
 using System.Linq;
+using UnityEngine.Events;
+using System;
 
 public class SelectionManager : Singleton<SelectionManager>
 {
@@ -17,19 +19,22 @@ public class SelectionManager : Singleton<SelectionManager>
     #endregion
 
     #region Classes
+    [Serializable]
+    public class SelectedChangedEvent : UnityEvent<BaseObject> { }
     #endregion
 
     #region Fiedls
-    private SelectableMonoBehaviour _selected;
+    private BaseObject _selected;
 
     private VectorLine _line;
     #endregion
 
     #region Events
+    public SelectedChangedEvent SelectedChanged;
     #endregion
 
     #region Properties
-    public SelectableMonoBehaviour Selected
+    public BaseObject Selected
     {
         get { return _selected; }
         set
@@ -42,6 +47,8 @@ public class SelectionManager : Singleton<SelectionManager>
             _selected = value;
 
             SetLineActive(_selected != null);
+
+            SelectedChanged.Invoke(_selected);
         }
     }
     #endregion
@@ -124,17 +131,15 @@ public class SelectionManager : Singleton<SelectionManager>
         _line.MakeRect(minPoint, maxPoint);
         _line.Draw();
     }
-    #endregion
 
-    #region Event handlers
-    public void InputManager_MouseLeftButtonClicked(InputManager.MouseInformation mouseInfo)
+    private void SelectFromScreen(bool isMouseInViewport, Vector2 position)
     {
-        if (!mouseInfo.IsMouseInViewport)
+        if (!isMouseInViewport)
         {
             return;
         }
 
-        Ray ray = Camera.main.ScreenPointToRay(mouseInfo.Position);
+        Ray ray = Camera.main.ScreenPointToRay(position);
         RaycastHit hitInfo;
 
         // States:
@@ -147,7 +152,7 @@ public class SelectionManager : Singleton<SelectionManager>
         {
             raycastResult = 1;
 
-            if (hitInfo.collider.GetComponent<SelectableMonoBehaviour>() != null)
+            if (hitInfo.collider.GetComponent<BaseObject>() != null)
             {
                 raycastResult = 2;
             }
@@ -162,9 +167,16 @@ public class SelectionManager : Singleton<SelectionManager>
                 break;
             // Raycast to selectable.
             case 2:
-                Selected = hitInfo.collider.GetComponent<SelectableMonoBehaviour>();
+                Selected = hitInfo.collider.GetComponent<BaseObject>();
                 break;
         }
+    }
+    #endregion
+
+    #region Event handlers
+    public void InputManager_MouseLeftButtonClicked(InputManager.MouseInformation mouseInfo)
+    {
+        SelectFromScreen(mouseInfo.IsMouseInViewport, mouseInfo.Position);
     }
     #endregion
 }
