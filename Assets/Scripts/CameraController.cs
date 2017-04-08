@@ -25,10 +25,10 @@ public class CameraController : MonoBehaviour
     private float _moveDistancePerPixel = 1f;
 
     [SerializeField]
-    private float _heightPositionMin = 6f;
+    private float _heightPositionMin = 8f;
 
     [SerializeField]
-    private float _heightPositionMax = 12f;
+    private float _heightPositionMax = 64f;
 
     private Vector3 _targetPosition;
 
@@ -56,7 +56,7 @@ public class CameraController : MonoBehaviour
 
     private void CalculateHorizontalPosition(Vector2 mouseDeltaPosition)
     {
-        _targetPosition -= new Vector3(mouseDeltaPosition.x, 0f, mouseDeltaPosition.y) * _moveDistancePerPixel;
+        _targetPosition -= new Vector3(mouseDeltaPosition.x, 0f, mouseDeltaPosition.y) * _moveDistancePerPixel * (transform.position.y / _heightPositionMin);
     }
 
     private void CalculateHeight(bool isMouseInViewport, float mouseScrollDelta)

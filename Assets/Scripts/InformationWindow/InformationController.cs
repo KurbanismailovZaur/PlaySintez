@@ -127,8 +127,10 @@ namespace InformationWindow
                         _trackedObject.GetComponent<Star>().StateChanged.RemoveListener(Star_StateChanged);
                         break;
                     case BaseObject.ObjectType.Orbit:
+                        _trackedObject.GetComponent<Orbit>().StateChanged.RemoveListener(Orbit_StateChanged);
                         break;
                     case BaseObject.ObjectType.Module:
+                        _trackedObject.GetComponent<Module>().StateChanged.RemoveListener(Module_StateChanged);
                         break;
                 }
             }
@@ -152,11 +154,25 @@ namespace InformationWindow
                     _trackedInformationWindow = _starInformation.gameObject;
                     _trackedInformationWindow.SetActive(true);
 
-                    _starInformation.UpdateInformationAboutStar(star.GetState());
+                    UpdateInformationAboutStar(star.GetState());
                     break;
                 case BaseObject.ObjectType.Orbit:
+                    Orbit orbit = _trackedObject.GetComponent<Orbit>();
+                    orbit.StateChanged.AddListener(Orbit_StateChanged);
+
+                    _trackedInformationWindow = _orbitInformation.gameObject;
+                    _trackedInformationWindow.SetActive(true);
+
+                    UpdateInformationAboutOrbit(orbit.GetState());
                     break;
                 case BaseObject.ObjectType.Module:
+                    Module module = _trackedObject.GetComponent<Module>();
+                    module.StateChanged.AddListener(Module_StateChanged);
+
+                    _trackedInformationWindow = _orbitInformation.gameObject;
+                    _trackedInformationWindow.SetActive(true);
+
+                    UpdateInformationAboutModule(module.GetState());
                     break;
             }
         }
@@ -164,6 +180,16 @@ namespace InformationWindow
         private void UpdateInformationAboutStar(Star.State state)
         {
             _starInformation.UpdateInformationAboutStar(state);
+        }
+
+        private void UpdateInformationAboutOrbit(Orbit.State state)
+        {
+            _orbitInformation.UpdateInformationAboutOrbit(state);
+        }
+
+        private void UpdateInformationAboutModule(Module.State state)
+        {
+            _moduleInformation.UpdateInformationAboutModule(state);
         }
         #endregion
 
@@ -181,6 +207,16 @@ namespace InformationWindow
         private void Star_StateChanged(Star.State state)
         {
             UpdateInformationAboutStar(state);
+        }
+
+        private void Orbit_StateChanged(Orbit.State state)
+        {
+            UpdateInformationAboutOrbit(state);
+        }
+
+        private void Module_StateChanged(Module.State state)
+        {
+            UpdateInformationAboutModule(state);
         }
         #endregion
     }

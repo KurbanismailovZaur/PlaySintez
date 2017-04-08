@@ -2,48 +2,46 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
-public class BaseObject : BoundableObject
+public class Module : BaseObject
 {
     #region Enums
-    public enum ObjectType
-    {
-        Star,
-        Orbit,
-        Module
-    }
     #endregion
 
     #region Delegates
     #endregion
 
     #region Structs
+    public struct State
+    {
+
+    }
     #endregion
 
     #region Classes
+    [Serializable]
+    public class StateChangedEvent : UnityEvent<State> { }
     #endregion
 
     #region Fiedls
-    [SerializeField]
-    private ObjectType _type;
     #endregion
 
     #region Events
+    public StateChangedEvent StateChanged;
     #endregion
 
     #region Properties
-    public ObjectType Type
-    {
-        get { return _type; }
-        protected set { _type = value; }
-    }
     #endregion
 
     #region Constructors
     #endregion
 
     #region Methods
+    public State GetState()
+    {
+        return new State();
+    }
     #endregion
 
     #region Event handlers

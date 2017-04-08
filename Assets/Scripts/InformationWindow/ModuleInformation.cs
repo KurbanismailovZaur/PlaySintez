@@ -31,6 +31,10 @@ namespace InformationWindow
         #endregion
 
         #region Methods
+        public void UpdateInformationAboutModule(Module.State state)
+        {
+
+        }
         #endregion
 
         #region Event handlers

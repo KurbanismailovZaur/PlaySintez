@@ -68,6 +68,11 @@ public class Star : BaseObject
 
     [SerializeField]
     private float _animationDuration = 1f;
+
+    [SerializeField]
+    private Transform _orbitsContainer;
+
+    private List<Orbit> _orbits = new List<Orbit>();
     #endregion
 
     #region Events
@@ -154,7 +159,18 @@ public class Star : BaseObject
         _levelProgress = 0f;
         _level += 1;
 
+        CreateNewOrbit(_level + 1);
+
         StateChanged.Invoke(GetState());
+    }
+
+    private void CreateNewOrbit(float radius)
+    {
+        Orbit.Factory orbitFactory = new Orbit.Factory();
+        Orbit orbit = orbitFactory.Create(radius);
+
+        orbit.transform.SetParent(_orbitsContainer, false);
+        _orbits.Add(orbit);
     }
 
     public State GetState()
