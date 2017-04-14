@@ -35,7 +35,7 @@ public class EnergyManager : Singleton<EnergyManager>
     #region Event handlers
     public void LookVideo()
     {
-        _star.TakeEnergy(new EnergyUnit(EnergyUnit.EnergyType.Video, EnergyUnit.EnergyOwner.Me));
+        _star.TakeEnergy(new EnergyUnit(EnergyUnit.EnergyType.Look, EnergyUnit.EnergyOwner.Me));
     }
 
     public void MakeComment()
@@ -50,17 +50,17 @@ public class EnergyManager : Singleton<EnergyManager>
 
     public void LookMyVideo()
     {
-        _star.TakeEnergy(new EnergyUnit(EnergyUnit.EnergyType.Video, EnergyUnit.EnergyOwner.Other));
+        _star.TakeEnergy(new EnergyUnit(EnergyUnit.EnergyType.Look, EnergyUnit.EnergyOwner.Other));
     }
 
     public void MakeMeComment()
     {
-        _star.TakeEnergy(new EnergyUnit(EnergyUnit.EnergyType.Video, EnergyUnit.EnergyOwner.Other));
+        _star.TakeEnergy(new EnergyUnit(EnergyUnit.EnergyType.Look, EnergyUnit.EnergyOwner.Other));
     }
 
     public void MakeMeLike()
     {
-        _star.TakeEnergy(new EnergyUnit(EnergyUnit.EnergyType.Video, EnergyUnit.EnergyOwner.Other));
+        _star.TakeEnergy(new EnergyUnit(EnergyUnit.EnergyType.Look, EnergyUnit.EnergyOwner.Other));
     }
     #endregion
 }

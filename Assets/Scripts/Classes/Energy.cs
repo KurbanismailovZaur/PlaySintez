@@ -7,7 +7,7 @@ public class EnergyUnit
     #region Enums
     public enum EnergyType
     {
-        Video,
+        Look,
         Comment,
         Like
     }

@@ -121,7 +121,7 @@ namespace InformationWindow
             {
                 _trackedInformationWindow.SetActive(false);
 
-                switch (_trackedObject.Type)
+                switch (_trackedObject.BaseObjectType)
                 {
                     case BaseObject.ObjectType.Star:
                         _trackedObject.GetComponent<Star>().StateChanged.RemoveListener(Star_StateChanged);
@@ -145,7 +145,7 @@ namespace InformationWindow
 
             _trackedObject = selected;
 
-            switch (_trackedObject.Type)
+            switch (_trackedObject.BaseObjectType)
             {
                 case BaseObject.ObjectType.Star:
                     Star star = _trackedObject.GetComponent<Star>();

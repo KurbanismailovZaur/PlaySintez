@@ -84,6 +84,14 @@ public class EmulationController : MonoBehaviour
 
         seq.Play();
     }
+
+    public void SetInteractableState(bool state)
+    {
+        foreach (Transform child in _emulationList)
+        {
+            child.GetComponent<Button>().interactable = state;
+        }
+    }
     #endregion
 
     #region Event handlers

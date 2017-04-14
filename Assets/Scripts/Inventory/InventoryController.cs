@@ -4,99 +4,154 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InventoryController : MonoBehaviour 
+namespace Inventory
 {
-    #region Enums
-    #endregion
-
-    #region Delegates
-    #endregion
-
-    #region Structs
-    #endregion
-
-    #region Classes
-    #endregion
-
-    #region Fiedls
-    private bool _isBusy;
-    private bool _isOpen;
-
-    [SerializeField]
-    private RectTransform _inventoryContainer;
-
-    [SerializeField]
-    private Image _arrowImage;
-
-    [SerializeField]
-    private float _animationDuration = 1f;
-    #endregion
-
-    #region Events
-    #endregion
-
-    #region Properties
-    #endregion
-
-    #region Methods
-    public void Open()
+    public class InventoryController : MonoBehaviour
     {
-        if (_isBusy || _isOpen)
+        #region Enums
+        #endregion
+
+        #region Delegates
+        #endregion
+
+        #region Structs
+        #endregion
+
+        #region Classes
+        #endregion
+
+        #region Fiedls
+        private bool _isBusy;
+        private bool _isOpen;
+
+        [SerializeField]
+        private RectTransform _inventoryContainer;
+
+        [SerializeField]
+        private Image _arrowImage;
+
+        [SerializeField]
+        private float _animationDuration = 1f;
+
+        private List<Element.ModuleType> _modules;
+        #endregion
+
+        #region Events
+        #endregion
+
+        #region Properties
+        #endregion
+
+        #region Methods
+        private void Awake()
         {
-            return;
+            _modules = new List<Element.ModuleType>();
         }
 
-        _isBusy = true;
-
-        Sequence seq = DOTween.Sequence();
-
-        seq.Insert(0f, ((RectTransform)transform).DOAnchorPosX(0f, _animationDuration));
-        seq.Insert(0f, _arrowImage.rectTransform.DORotate(new Vector3(0f, 0f, 180f), _animationDuration));
-
-        seq.AppendCallback(() =>
+        private void Start()
         {
-            _isBusy = false;
-            _isOpen = true;
-        });
+            UpdateElements();
+        }
 
-        seq.Play();
+        public void Open()
+        {
+            if (_isBusy || _isOpen)
+            {
+                return;
+            }
+
+            _isBusy = true;
+
+            Sequence seq = DOTween.Sequence();
+
+            seq.Insert(0f, ((RectTransform)transform).DOAnchorPosX(0f, _animationDuration));
+            seq.Insert(0f, _arrowImage.rectTransform.DORotate(new Vector3(0f, 0f, 180f), _animationDuration));
+
+            seq.AppendCallback(() =>
+            {
+                _isBusy = false;
+                _isOpen = true;
+            });
+
+            seq.Play();
+        }
+
+        public void Close()
+        {
+            if (_isBusy || !_isOpen)
+            {
+                return;
+            }
+
+            _isBusy = true;
+
+            Sequence seq = DOTween.Sequence();
+
+            seq.Insert(0f, ((RectTransform)transform).DOAnchorPosX(-_inventoryContainer.sizeDelta.x, _animationDuration));
+            seq.Insert(0f, _arrowImage.rectTransform.DORotate(Vector3.zero, _animationDuration));
+
+            seq.AppendCallback(() =>
+            {
+                _isBusy = false;
+                _isOpen = false;
+            });
+
+            seq.Play();
+        }
+
+        public void SwitchState()
+        {
+            if (_isOpen)
+            {
+                Close();
+            }
+            else
+            {
+                Open();
+            }
+        }
+
+        private void UpdateElements()
+        {
+            _inventoryContainer.RemoveAllChilds();
+
+            foreach (Element.ModuleType module in _modules)
+            {
+                switch (module)
+                {
+                    case Element.ModuleType.LookCapsule:
+                        Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/LookCapsule"), _inventoryContainer, false);
+                        break;
+                    case Element.ModuleType.CommentCapsule:
+                        Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/CommentCapsule"), _inventoryContainer, false);
+                        break;
+                    case Element.ModuleType.LikeCapsule:
+                        Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/LikeCapsule"), _inventoryContainer, false);
+                        break;
+                    case Element.ModuleType.Base:
+                        //Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/EmptyElement"), _inventoryContainer, false);
+                        break;
+                    case Element.ModuleType.ResearchCenter:
+                        //Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/EmptyElement"), _inventoryContainer, false);
+                        break;
+                }
+            }
+
+            for (int i = _modules.Count; i < 16; i++)
+            {
+                Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/EmptyElement"), _inventoryContainer, false);
+            }
+        }
+
+        public void AddElement(Element.ModuleType moduleType)
+        {
+            _modules.Add(moduleType);
+
+            UpdateElements();
+        }
+        #endregion
+
+        #region Event handlers
+        #endregion
     }
-
-    public void Close()
-    {
-        if (_isBusy || !_isOpen)
-        {
-            return;
-        }
-
-        _isBusy = true;
-
-        Sequence seq = DOTween.Sequence();
-
-        seq.Insert(0f, ((RectTransform)transform).DOAnchorPosX(-_inventoryContainer.sizeDelta.x, _animationDuration));
-        seq.Insert(0f, _arrowImage.rectTransform.DORotate(Vector3.zero, _animationDuration));
-
-        seq.AppendCallback(() =>
-        {
-            _isBusy = false;
-            _isOpen = false;
-        });
-
-        seq.Play();
-    }
-    #endregion
-
-    #region Event handlers
-    public void SwitchState()
-    {
-        if (_isOpen)
-        {
-            Close();
-        }
-        else
-        {
-            Open();
-        }
-    }
-    #endregion
 }

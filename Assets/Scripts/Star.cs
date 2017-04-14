@@ -49,6 +49,9 @@ public class Star : BaseObject
     #region Classes
     [Serializable]
     public class StateChangedEvent : UnityEvent<State> { }
+
+    [Serializable]
+    public class LevelIncrementedEvent : UnityEvent<byte> { }
     #endregion
 
     #region Fiedls
@@ -77,6 +80,7 @@ public class Star : BaseObject
 
     #region Events
     public StateChangedEvent StateChanged;
+    public LevelIncrementedEvent LevelIncremented;
     #endregion
 
     #region Properties
@@ -162,6 +166,7 @@ public class Star : BaseObject
         CreateNewOrbit(_level + 1);
 
         StateChanged.Invoke(GetState());
+        LevelIncremented.Invoke(_level);
     }
 
     private void CreateNewOrbit(float radius)

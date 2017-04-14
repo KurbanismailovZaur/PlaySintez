@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Inventory
 {
-    public class EmptyElement : BaseElement
+    public class EmptyElement
     {
         #region Enums
         #endregion

@@ -33,14 +33,31 @@ public class Orbit : BaseObject
         public Orbit Create(float radius, PrefixType? prefix = null)
         {
             Orbit orbit = new GameObject("Orbit").AddComponent<Orbit>();
-            orbit.Type = ObjectType.Orbit;
+            orbit.BaseObjectType = ObjectType.Orbit;
+            orbit._radius = radius;
+            orbit._maxSocketCount = (int)radius * 2;
 
             int orbitSegmentsCount = 64;
             VectorLine orbitLine = new VectorLine("OrbitLine", new List<Vector3>(orbitSegmentsCount + 1), 1f);
             orbitLine.lineType = LineType.Continuous;
-            orbitLine.MakeCircle(Vector3.zero, Vector3.up, radius, orbitSegmentsCount);
+            orbitLine.MakeCircle(Vector3.zero, Vector3.up, orbit._radius, orbitSegmentsCount);
             orbit._prefix = prefix ?? (PrefixType)UnityEngine.Random.Range(0, 3);
-            orbitLine.color = Color.red;
+
+            Material lineMaterial = new Material(Shader.Find("Unlit/Color"));
+            lineMaterial.color = new Color32(128, 128, 128, 255);
+            orbitLine.material = lineMaterial;
+            
+            Transform socketPrefab = Resources.Load<Transform>("Socket/Socket");
+
+            orbit._socketCount = UnityEngine.Random.Range(1, orbit._maxSocketCount);
+            orbit._distanceBetweenSockets = 1f / orbit._socketCount;
+
+            for (int i = 0; i < orbit._socketCount; i++)
+            {
+                Transform socket = Instantiate(socketPrefab, orbit.transform, false);
+                Vector3 pos = orbitLine.GetPoint3D01(orbit._distanceBetweenSockets * i);
+                socket.position = pos;
+            }
 
             orbitLine.drawTransform = orbit.transform;
             orbitLine.layer = LayerMask.NameToLayer("Default");
@@ -60,6 +77,12 @@ public class Orbit : BaseObject
     #region Fiedls
     private PrefixType _prefix;
     private VectorLine _line;
+
+    private float _radius;
+
+    private int _maxSocketCount;
+    private int _socketCount;
+    private float _distanceBetweenSockets;
     #endregion
 
     #region Events
@@ -78,6 +101,11 @@ public class Orbit : BaseObject
     public State GetState()
     {
         return new State();
+    }
+
+    private void Update()
+    {
+        transform.Rotate(Vector3.up, 1f / (_radius / 4f) * Time.deltaTime);
     }
     #endregion
 

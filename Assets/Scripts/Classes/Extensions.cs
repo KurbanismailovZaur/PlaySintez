@@ -38,6 +38,26 @@ public static class Extensions
     {
         return Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y) && Mathf.Approximately(a.z, b.z);
     }
+
+    public static void RemoveAllChilds(this Transform transform)
+    {
+        Transform[] childs = new Transform[transform.childCount];
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            childs[i] = transform.GetChild(i);
+        }
+
+        foreach (Transform child in childs)
+        {
+            Object.Destroy(child.gameObject);
+        }
+    }
+
+    public static void RemoveAllChilds(this RectTransform rectTransform)
+    {
+        ((Transform)rectTransform).RemoveAllChilds();
+    }
     #endregion
 
     #region Event handlers

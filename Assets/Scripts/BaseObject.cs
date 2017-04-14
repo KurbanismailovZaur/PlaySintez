@@ -26,17 +26,17 @@ public class BaseObject : BoundableObject
 
     #region Fiedls
     [SerializeField]
-    private ObjectType _type;
+    private ObjectType _objectType;
     #endregion
 
     #region Events
     #endregion
 
     #region Properties
-    public ObjectType Type
+    public ObjectType BaseObjectType
     {
-        get { return _type; }
-        protected set { _type = value; }
+        get { return _objectType; }
+        protected set { _objectType = value; }
     }
     #endregion
 

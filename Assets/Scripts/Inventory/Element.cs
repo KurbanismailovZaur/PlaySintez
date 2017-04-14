@@ -5,9 +5,17 @@ using UnityEngine.UI;
 
 namespace Inventory
 {
-    public class Element : BaseElement
+    public abstract class Element : MonoBehaviour
     {
         #region Enums
+        public enum ModuleType
+        {
+            LookCapsule,
+            CommentCapsule,
+            LikeCapsule,
+            Base,
+            ResearchCenter
+        }
         #endregion
 
         #region Delegates
@@ -47,6 +55,7 @@ namespace Inventory
         #endregion
 
         #region Methods
+        public abstract ModuleType GetModuleType();
         #endregion
 
         #region Event handlers
