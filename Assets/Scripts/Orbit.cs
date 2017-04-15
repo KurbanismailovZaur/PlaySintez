@@ -57,6 +57,8 @@ public class Orbit : BaseObject
                 Transform socket = Instantiate(socketPrefab, orbit.transform, false);
                 Vector3 pos = orbitLine.GetPoint3D01(orbit._distanceBetweenSockets * i);
                 socket.position = pos;
+
+                socket.rotation = Quaternion.LookRotation(pos - orbit.transform.position);
             }
 
             orbitLine.drawTransform = orbit.transform;

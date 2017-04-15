@@ -31,10 +31,10 @@ namespace Inventory
 
         #region Classes
         [Serializable]
-        public class StartDragEvent : UnityEvent<Element> { }
+        public class DragingEvent : UnityEvent<Element> { }
 
         [Serializable]
-        public class EndDragEvent : UnityEvent<Element> { }
+        public class DropedEvent : UnityEvent<Element> { }
         #endregion
 
         #region Fiedls
@@ -53,8 +53,8 @@ namespace Inventory
         #endregion
 
         #region Events
-        public StartDragEvent Draging;
-        public EndDragEvent Draged;
+        public DragingEvent Draging;
+        public DropedEvent Droped;
         #endregion
 
         #region Properties
@@ -102,7 +102,7 @@ namespace Inventory
             _tween.Kill();
             _tween = DOTween.To(() => { return _canvasGroup.alpha; }, (x) => { _canvasGroup.alpha = x; }, 1f, 0.250f).Play();
 
-            Draged.Invoke(this);
+            Droped.Invoke(this);
         }
 
         private void ProcessDrag(InputManager.MouseInformation mouseInfo)
@@ -111,6 +111,11 @@ namespace Inventory
 
             Vector2 scaledMouseDelta = Vector2.Scale(mouseInfo.MouseDeltaPosition, new Vector2(1f / _canvas.transform.lossyScale.x, 1f / _canvas.transform.lossyScale.y));
             rectTransform.anchoredPosition += scaledMouseDelta;
+        }
+
+        private void OnDestroy()
+        {
+            _tween.Kill();
         }
         #endregion
 

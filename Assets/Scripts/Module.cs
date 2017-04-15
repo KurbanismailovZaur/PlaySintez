@@ -7,6 +7,14 @@ using UnityEngine.Events;
 public class Module : BaseObject
 {
     #region Enums
+    public enum Type
+    {
+        LookCapsule,
+        CommentCapsule,
+        LikeCapsule,
+        Base,
+        ResearchCenter
+    }
     #endregion
 
     #region Delegates
@@ -25,6 +33,8 @@ public class Module : BaseObject
     #endregion
 
     #region Fiedls
+    [SerializeField]
+    private Type _moduleType;
     #endregion
 
     #region Events
@@ -32,6 +42,7 @@ public class Module : BaseObject
     #endregion
 
     #region Properties
+    public Type ModuleType { get { return _moduleType; } }
     #endregion
 
     #region Constructors

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Modules
 {
-    public class Capsule : BaseObject
+    public class Capsule : Module
     {
         #region Enums
         public enum EnergyType

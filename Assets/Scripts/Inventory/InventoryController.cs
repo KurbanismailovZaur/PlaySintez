@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using Modules;
 using System.Linq;
+using System;
+using UnityEngine.Events;
 
 namespace Inventory
 {
@@ -20,6 +22,8 @@ namespace Inventory
         #endregion
 
         #region Classes
+        [Serializable]
+        public class ElementDropedEvent : UnityEvent<Element, Vector2> { }
         #endregion
 
         #region Fiedls
@@ -46,6 +50,7 @@ namespace Inventory
         #endregion
 
         #region Events
+        public ElementDropedEvent ElementDroped; 
         #endregion
 
         #region Properties
@@ -145,7 +150,7 @@ namespace Inventory
             element.transform.SetSiblingIndex(_elements.Count - 1);
 
             element.Draging.AddListener(Element_Draging);
-            element.Draged.AddListener(Element_Draged);
+            element.Droped.AddListener(Element_Draged);
         }
 
         public void RemoveElement(Element element)
@@ -197,6 +202,8 @@ namespace Inventory
 
             element.transform.SetParent(_inventoryContainer);
             element.transform.SetSiblingIndex(_dragElementIndex);
+
+            ElementDroped.Invoke(element, InputManager.Instance.MouseInfo.Position);
         }
         #endregion
     }

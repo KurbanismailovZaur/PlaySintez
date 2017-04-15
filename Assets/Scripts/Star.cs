@@ -76,6 +76,9 @@ public class Star : BaseObject
     private Transform _orbitsContainer;
 
     private List<Orbit> _orbits = new List<Orbit>();
+
+    [SerializeField]
+    private Inventory.InventoryController _inventoryController;
     #endregion
 
     #region Events
@@ -182,8 +185,61 @@ public class Star : BaseObject
     {
         return new State(_energy, _energyProgress, _level, _levelProgress);
     }
+
+    private void InstallModuleFromInventory(Inventory.Element element, Vector2 screenPosition)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(screenPosition);
+
+        RaycastHit hitInfo;
+        bool isHited = Physics.Raycast(ray, out hitInfo);
+
+        if (!isHited)
+        {
+            return;
+        }
+
+        Socket socket = hitInfo.collider.GetComponent<Socket>();
+
+        if (socket == null)
+        {
+            return;
+        }
+
+        switch (element.GetModuleType())
+        {
+            case Inventory.Element.ModuleType.LookCapsule:
+                InstallCapsule("Modules/RCapsule/RCapsule", element, socket);
+                break;
+            case Inventory.Element.ModuleType.CommentCapsule:
+                InstallCapsule("Modules/GCapsule/GCapsule", element, socket);
+                break;
+            case Inventory.Element.ModuleType.LikeCapsule:
+                InstallCapsule("Modules/BCapsule/BCapsule", element, socket);
+                break;
+            case Inventory.Element.ModuleType.Base:
+                print("Base");
+                break;
+            case Inventory.Element.ModuleType.ResearchCenter:
+                print("ResearchCenter");
+                break;
+        }
+    }
+
+    private void InstallCapsule(string pathToPrefab, Inventory.Element element, Socket socket)
+    {
+        Module capsule = Instantiate(Resources.Load<Module>(pathToPrefab));
+
+        if (socket.InstallModule(capsule))
+        {
+            _inventoryController.RemoveElement(element);
+        }
+    }
     #endregion
 
     #region Event handlers
+    public void Inventory_ElementDroped(Inventory.Element element, Vector2 screenPosition)
+    {
+        InstallModuleFromInventory(element, screenPosition);
+    }
     #endregion
 }

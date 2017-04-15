@@ -64,7 +64,7 @@ public class InputManager : Singleton<InputManager>
     #endregion
 
     #region Properties
-
+    public MouseInformation MouseInfo { get { return _mouseInfo; } }
     #endregion
 
     #region Constructors
