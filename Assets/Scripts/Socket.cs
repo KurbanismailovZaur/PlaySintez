@@ -17,6 +17,8 @@ public class Socket : MonoBehaviour
     #endregion
 
     #region Fiedls
+    [SerializeField]
+    private BaseObject _connectedModule;
     #endregion
 
     #region Events

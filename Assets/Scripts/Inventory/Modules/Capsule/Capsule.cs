@@ -1,18 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Inventory;
 
-namespace Modules
+namespace Inventory
 {
-    public class Capsule : BaseObject
+    public abstract class Capsule : Element
     {
         #region Enums
-        public enum EnergyType
-        {
-            Look,
-            Comment,
-            Like
-        }
         #endregion
 
         #region Delegates
@@ -25,34 +20,18 @@ namespace Modules
         #endregion
 
         #region Fiedls
-        [SerializeField]
-        private EnergyType _energyType;
-
-        private bool _isInitialized;
         #endregion
 
         #region Events
         #endregion
 
         #region Properties
-        public EnergyType CapsuleEnergyType { get { return _energyType; } }
         #endregion
 
         #region Constructors
         #endregion
 
         #region Methods
-        public void Initialize(Inventory.Capsule capsule)
-        {
-            if (_isInitialized)
-            {
-                return;
-            }
-
-
-
-            _isInitialized = true;
-        }
         #endregion
 
         #region Event handlers

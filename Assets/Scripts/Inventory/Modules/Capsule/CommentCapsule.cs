@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Inventory
 {
-    public class LookCapsule : Element
+    public class CommentCapsule : Element
     {
         #region Enums
         #endregion
@@ -20,7 +20,7 @@ namespace Inventory
         #endregion
 
         #region Fiedls
-        private const ModuleType _moduleType = ModuleType.LookCapsule;
+        private const ModuleType _moduleType = ModuleType.CommentCapsule;
         #endregion
 
         #region Events
@@ -35,7 +35,7 @@ namespace Inventory
         #region Methods
         public override ModuleType GetModuleType()
         {
-            return ModuleType.LookCapsule;
+            return _moduleType;
         }
         #endregion
 

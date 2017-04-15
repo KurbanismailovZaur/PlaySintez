@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Modules;
+using System.Linq;
 
 namespace Inventory
 {
@@ -28,12 +30,19 @@ namespace Inventory
         private RectTransform _inventoryContainer;
 
         [SerializeField]
+        private RectTransform _dragContainer;
+
+        [SerializeField]
         private Image _arrowImage;
 
         [SerializeField]
         private float _animationDuration = 1f;
 
-        private List<Element.ModuleType> _modules;
+        private List<Element> _elements = new List<Element>();
+        private byte _capacity = 16;
+
+        private int _dragElementIndex;
+        private bool _isDrag;
         #endregion
 
         #region Events
@@ -43,14 +52,9 @@ namespace Inventory
         #endregion
 
         #region Methods
-        private void Awake()
-        {
-            _modules = new List<Element.ModuleType>();
-        }
-
         private void Start()
         {
-            UpdateElements();
+            Initialize();
         }
 
         public void Open()
@@ -99,6 +103,14 @@ namespace Inventory
             seq.Play();
         }
 
+        private void Initialize()
+        {
+            for (int i = 0; i < _capacity; i++)
+            {
+                Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/EmptyElement"), _inventoryContainer, false);
+            }
+        }
+
         public void SwitchState()
         {
             if (_isOpen)
@@ -111,47 +123,81 @@ namespace Inventory
             }
         }
 
-        private void UpdateElements()
+        public void AddElement(Element element)
         {
-            _inventoryContainer.RemoveAllChilds();
-
-            foreach (Element.ModuleType module in _modules)
+            if (_elements.Contains(element))
             {
-                switch (module)
-                {
-                    case Element.ModuleType.LookCapsule:
-                        Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/LookCapsule"), _inventoryContainer, false);
-                        break;
-                    case Element.ModuleType.CommentCapsule:
-                        Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/CommentCapsule"), _inventoryContainer, false);
-                        break;
-                    case Element.ModuleType.LikeCapsule:
-                        Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/LikeCapsule"), _inventoryContainer, false);
-                        break;
-                    case Element.ModuleType.Base:
-                        //Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/EmptyElement"), _inventoryContainer, false);
-                        break;
-                    case Element.ModuleType.ResearchCenter:
-                        //Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/EmptyElement"), _inventoryContainer, false);
-                        break;
-                }
+                Debug.LogError("Element currenty in inventory");
+                return;
             }
 
-            for (int i = _modules.Count; i < 16; i++)
+            if (_elements.Count == 16)
             {
-                Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/EmptyElement"), _inventoryContainer, false);
+                Debug.LogError("Inventory is full");
+                return;
             }
+
+            _elements.Add(element);
+
+            DestroyImmediate(_inventoryContainer.GetChild(_inventoryContainer.childCount - 1).gameObject);
+
+            element.transform.SetParent(_inventoryContainer, false);
+            element.transform.SetSiblingIndex(_elements.Count - 1);
+
+            element.Draging.AddListener(Element_Draging);
+            element.Draged.AddListener(Element_Draged);
         }
 
-        public void AddElement(Element.ModuleType moduleType)
+        public void RemoveElement(Element element)
         {
-            _modules.Add(moduleType);
+            if (!_elements.Contains(element))
+            {
+                Debug.LogError("Element not exist in inventorys");
+                return;
+            }
 
-            UpdateElements();
+            int index = _elements.IndexOf(element);
+
+            _elements.Remove(element);
+            _inventoryContainer.DetachChild(index);
+            Destroy(element.gameObject);
+
+            Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/EmptyElement"), _inventoryContainer, false);
         }
         #endregion
 
         #region Event handlers
+        private void Element_Draging(Element element)
+        {
+            if (_isDrag)
+            {
+                return;
+            }
+
+            _dragElementIndex = _elements.IndexOf(element);
+
+            RectTransform tempElement = Instantiate(Resources.Load<RectTransform>("Inventory/InventoryModules/EmptyElement"), _inventoryContainer, false);
+            tempElement.SetSiblingIndex(_dragElementIndex);
+            element.transform.SetParent(_dragContainer);
+
+            _isDrag = true;
+        }
+
+        private void Element_Draged(Element element)
+        {
+            if (!_isDrag)
+            {
+                return;
+            }
+
+            _isDrag = false;
+
+            Destroy(_inventoryContainer.GetChild(_dragElementIndex).gameObject);
+            _inventoryContainer.DetachChild(_dragElementIndex);
+
+            element.transform.SetParent(_inventoryContainer);
+            element.transform.SetSiblingIndex(_dragElementIndex);
+        }
         #endregion
     }
 }

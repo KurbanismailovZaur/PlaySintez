@@ -58,6 +58,22 @@ public static class Extensions
     {
         ((Transform)rectTransform).RemoveAllChilds();
     }
+
+    public static void DetachChild(this Transform transform, int index)
+    {
+        if (index >= transform.childCount)
+        {
+            Debug.LogError("Index out of child count");
+            return;
+        }
+
+        transform.GetChild(index).SetParent(null);
+    }
+
+    public static void DetachChild(this RectTransform rectTransform, int index)
+    {
+        ((Transform)rectTransform).DetachChild(index);
+    }
     #endregion
 
     #region Event handlers

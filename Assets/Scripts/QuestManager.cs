@@ -45,7 +45,9 @@ public class QuestManager : Singleton<QuestManager>
     {
         if (level == 1)
         {
-            _inventory.AddElement(Element.ModuleType.LookCapsule);
+            LookCapsule lookCapsule = Instantiate(Resources.Load<LookCapsule>("Inventory/InventoryModules/LookCapsule"));
+            _inventory.AddElement(lookCapsule);
+
             _emulation.SetInteractableState(false);
             _task.SetTaskDescription("Set capsule to socket");
         }
