@@ -59,7 +59,8 @@ namespace Modules
                 return;
             }
 
-            //_capacity = capsule.
+            _capacity = capsule.Capacity;
+            _energy = capsule.Energy;
 
             _isInitialized = true;
         }

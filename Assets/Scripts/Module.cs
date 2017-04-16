@@ -36,6 +36,7 @@ public class Module : BaseObject
 
     #region Properties
     public Type ModuleType { get { return _moduleType; } }
+    public Socket Socket { get; set; }
     #endregion
 
     #region Constructors

@@ -55,10 +55,21 @@ public class Socket : MonoBehaviour
         module.transform.SetParent(transform, false);
         _connectedModule = module;
 
+        module.Socket = this;
+
         _collider.enabled = false;
         _renderer.enabled = false;
 
         return true;
+    }
+
+    public void RemoveModule()
+    {
+        _connectedModule.transform.SetParent(null);
+        _connectedModule = null;
+
+        _collider.enabled = true;
+        _renderer.enabled = true;
     }
     #endregion
 

@@ -235,12 +235,65 @@ public class Star : BaseObject
             _inventoryController.RemoveElement(element);
         }
     }
+
+    private void RemoveModule(Module module)
+    {
+        module.Socket.RemoveModule();
+
+        Destroy(module.gameObject);
+    }
+
+    private void PutCurrentSelectedModuleInInventory()
+    {
+        BaseObject baseObject = SelectionManager.Instance.Selected;
+
+        if (baseObject.BaseObjectType != ObjectType.Module)
+        {
+            return;
+        }
+
+        Module module = (Module)baseObject;
+
+        switch (module.ModuleType)
+        {
+            case Module.Type.LookCapsule:
+                MoveCapsuleToInventory(module, "Inventory/InventoryModules/LookCapsule");
+                break;
+            case Module.Type.CommentCapsule:
+                MoveCapsuleToInventory(module, "Inventory/InventoryModules/CommentCapsule");
+                break;
+            case Module.Type.LikeCapsule:
+                MoveCapsuleToInventory(module, "Inventory/InventoryModules/LikeCapsule");
+                break;
+            case Module.Type.Base:
+                break;
+            case Module.Type.ResearchCenter:
+                break;
+        }
+
+        SelectionManager.Instance.Selected = null;
+    }
+
+    private void MoveCapsuleToInventory(Module module, string pathToInventoryElement)
+    {
+        Inventory.Capsule lookCapsule = Instantiate(Resources.Load<Inventory.Capsule>(pathToInventoryElement));
+        lookCapsule.Initialize((Modules.Capsule)module);
+
+        _inventoryController.AddElement(lookCapsule);
+
+        RemoveModule(module);
+    }
     #endregion
 
     #region Event handlers
     public void Inventory_ElementDroped(Inventory.Element element, Vector2 screenPosition)
     {
         InstallModuleFromInventory(element, screenPosition);
+    }
+
+    public void InformationController_PutModuleInInventory()
+    {
+        PutCurrentSelectedModuleInInventory();
     }
     #endregion
 }
