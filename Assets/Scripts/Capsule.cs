@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Modules
 {
@@ -22,20 +24,28 @@ namespace Modules
         #endregion
 
         #region Classes
+        [Serializable]
+        public class StateChangedEvent : UnityEvent<Capsule> { }
         #endregion
 
         #region Fiedls
         [SerializeField]
         private EnergyType _energyType;
 
+        private int _capacity = 32;
+        private int _energy;
+
         private bool _isInitialized;
         #endregion
 
         #region Events
+        public StateChangedEvent StateChanged;
         #endregion
 
         #region Properties
         public EnergyType CapsuleEnergyType { get { return _energyType; } }
+        public int Capacity { get { return _capacity; } }
+        public int Energy { get { return _energy; } }
         #endregion
 
         #region Constructors
@@ -48,8 +58,6 @@ namespace Modules
             {
                 return;
             }
-
-
 
             _isInitialized = true;
         }

@@ -41,7 +41,13 @@ namespace InformationWindow
         private OrbitInformation _orbitInformation;
 
         [SerializeField]
-        private ModuleInformation _moduleInformation;
+        private CapsuleInformation _capsuleInformation;
+
+        [SerializeField]
+        private CapsuleInformation _baseInformation;
+
+        [SerializeField]
+        private CapsuleInformation _researchCenterInformation;
 
         private BaseObject _trackedObject;
         private GameObject _trackedInformationWindow;
@@ -130,7 +136,21 @@ namespace InformationWindow
                         _trackedObject.GetComponent<Orbit>().StateChanged.RemoveListener(Orbit_StateChanged);
                         break;
                     case BaseObject.ObjectType.Module:
-                        _trackedObject.GetComponent<Module>().StateChanged.RemoveListener(Module_StateChanged);
+                        Module module = _trackedObject.GetComponent<Module>();
+
+                        switch (module.ModuleType)
+                        {
+                            case Module.Type.LookCapsule:
+                            case Module.Type.CommentCapsule:
+                            case Module.Type.LikeCapsule:
+                                _trackedObject.GetComponent<Modules.Capsule>().StateChanged.RemoveListener(Capsule_StateChanged);
+                                break;
+                            case Module.Type.Base:
+                                break;
+                            case Module.Type.ResearchCenter:
+                                break;
+                        }
+
                         break;
                 }
             }
@@ -167,12 +187,25 @@ namespace InformationWindow
                     break;
                 case BaseObject.ObjectType.Module:
                     Module module = _trackedObject.GetComponent<Module>();
-                    module.StateChanged.AddListener(Module_StateChanged);
 
-                    _trackedInformationWindow = _orbitInformation.gameObject;
+                    switch (module.ModuleType)
+                    {
+                        case Module.Type.LookCapsule:
+                        case Module.Type.CommentCapsule:
+                        case Module.Type.LikeCapsule:
+                            _trackedInformationWindow = _capsuleInformation.gameObject;
+                            Modules.Capsule capsule = module.GetComponent<Modules.Capsule>();
+                            capsule.StateChanged.AddListener(Capsule_StateChanged);
+                            UpdateInformationAboutCapsule(capsule);
+                            break;
+                        case Module.Type.Base:
+                            break;
+                        case Module.Type.ResearchCenter:
+                            break;
+                    }
+                    
                     _trackedInformationWindow.SetActive(true);
-
-                    UpdateInformationAboutModule(module.GetState());
+                    
                     break;
             }
         }
@@ -187,9 +220,9 @@ namespace InformationWindow
             _orbitInformation.UpdateInformationAboutOrbit(state);
         }
 
-        private void UpdateInformationAboutModule(Module.State state)
+        private void UpdateInformationAboutCapsule(Modules.Capsule capsule)
         {
-            _moduleInformation.UpdateInformationAboutModule(state);
+            _capsuleInformation.UpdateInformationAboutCapsule(capsule);
         }
         #endregion
 
@@ -204,6 +237,7 @@ namespace InformationWindow
             TrackInformationAboutSelected(selected);
         }
 
+        #region BaseObject state changed handlers
         private void Star_StateChanged(Star.State state)
         {
             UpdateInformationAboutStar(state);
@@ -214,10 +248,11 @@ namespace InformationWindow
             UpdateInformationAboutOrbit(state);
         }
 
-        private void Module_StateChanged(Module.State state)
+        private void Capsule_StateChanged(Modules.Capsule capsule)
         {
-            UpdateInformationAboutModule(state);
+            UpdateInformationAboutCapsule(capsule);
         }
+        #endregion
         #endregion
     }
 }

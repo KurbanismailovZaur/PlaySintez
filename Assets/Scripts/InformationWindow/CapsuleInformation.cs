@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace InformationWindow
 {
-    public class ModuleInformation : MonoBehaviour
+    public class CapsuleInformation : MonoBehaviour
     {
         #region Enums
         #endregion
@@ -19,6 +20,14 @@ namespace InformationWindow
         #endregion
 
         #region Fiedls
+        [SerializeField]
+        private Text _energyTypeText;
+
+        [SerializeField]
+        private Text _capacityText;
+
+        [SerializeField]
+        private Text _energyText;
         #endregion
 
         #region Events
@@ -31,9 +40,11 @@ namespace InformationWindow
         #endregion
 
         #region Methods
-        public void UpdateInformationAboutModule(Module.State state)
+        public void UpdateInformationAboutCapsule(Modules.Capsule capsule)
         {
-
+            _energyTypeText.text = capsule.CapsuleEnergyType.ToString();
+            _capacityText.text = capsule.Capacity.ToString();
+            _energyText.text = capsule.Energy.ToString();
         }
         #endregion
 

@@ -21,15 +21,9 @@ public class Module : BaseObject
     #endregion
 
     #region Structs
-    public struct State
-    {
-
-    }
     #endregion
 
     #region Classes
-    [Serializable]
-    public class StateChangedEvent : UnityEvent<State> { }
     #endregion
 
     #region Fiedls
@@ -38,7 +32,6 @@ public class Module : BaseObject
     #endregion
 
     #region Events
-    public StateChangedEvent StateChanged;
     #endregion
 
     #region Properties
@@ -49,10 +42,6 @@ public class Module : BaseObject
     #endregion
 
     #region Methods
-    public State GetState()
-    {
-        return new State();
-    }
     #endregion
 
     #region Event handlers
