@@ -45,13 +45,13 @@ public class QuestManager : Singleton<QuestManager>
     {
         if (level == 1)
         {
-            LookCapsule lookCapsule = Instantiate(Resources.Load<LookCapsule>("Inventory/InventoryModules/LookCapsule"));
+            Capsule lookCapsule = Instantiate(Resources.Load<Capsule>("Inventory/InventoryModules/LookCapsule"));
             _inventory.AddElement(lookCapsule);
 
-            CommentCapsule commentCapsule = Instantiate(Resources.Load<CommentCapsule>("Inventory/InventoryModules/CommentCapsule"));
+            Capsule commentCapsule = Instantiate(Resources.Load<Capsule>("Inventory/InventoryModules/CommentCapsule"));
             _inventory.AddElement(commentCapsule);
 
-            LikeCapsule likeCapsule = Instantiate(Resources.Load<LikeCapsule>("Inventory/InventoryModules/LikeCapsule"));
+            Capsule likeCapsule = Instantiate(Resources.Load<Capsule>("Inventory/InventoryModules/LikeCapsule"));
             _inventory.AddElement(likeCapsule);
 
             _emulation.SetInteractableState(false);

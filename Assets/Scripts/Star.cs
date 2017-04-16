@@ -227,7 +227,8 @@ public class Star : BaseObject
 
     private void InstallCapsule(string pathToPrefab, Inventory.Element element, Socket socket)
     {
-        Module capsule = Instantiate(Resources.Load<Module>(pathToPrefab));
+        Modules.Capsule capsule = Instantiate(Resources.Load<Modules.Capsule>(pathToPrefab));
+        capsule.Initialize((Inventory.Capsule)element);
 
         if (socket.InstallModule(capsule))
         {

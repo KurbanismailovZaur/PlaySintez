@@ -59,6 +59,8 @@ namespace Modules
                 return;
             }
 
+            //_capacity = capsule.
+
             _isInitialized = true;
         }
         #endregion

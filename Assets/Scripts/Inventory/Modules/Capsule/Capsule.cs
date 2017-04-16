@@ -5,7 +5,7 @@ using Inventory;
 
 namespace Inventory
 {
-    public abstract class Capsule : Element
+    public class Capsule : Element
     {
         #region Enums
         #endregion
@@ -20,6 +20,8 @@ namespace Inventory
         #endregion
 
         #region Fiedls
+        [SerializeField]
+        private ModuleType _moduleType;
         #endregion
 
         #region Events
@@ -32,6 +34,10 @@ namespace Inventory
         #endregion
 
         #region Methods
+        public override ModuleType GetModuleType()
+        {
+            return _moduleType;
+        }
         #endregion
 
         #region Event handlers
