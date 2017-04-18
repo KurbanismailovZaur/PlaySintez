@@ -59,6 +59,8 @@ public class Orbit : BaseObject
                 socket.position = pos;
 
                 socket.rotation = Quaternion.LookRotation(pos - orbit.transform.position);
+
+                socket.GetComponent<Socket>().ModuleChanged.AddListener(orbit.Socket_ModuleChanged);
             }
 
             orbitLine.drawTransform = orbit.transform;
@@ -74,6 +76,9 @@ public class Orbit : BaseObject
 
     [Serializable]
     public class StateChangedEvent : UnityEvent<State> { }
+
+    [SerializeField]
+    public class SocketModuleChangedEvent : UnityEvent<Orbit, Socket, Module> { }
     #endregion
 
     #region Fiedls
@@ -89,6 +94,7 @@ public class Orbit : BaseObject
 
     #region Events
     public StateChangedEvent StateChanged;
+    public SocketModuleChangedEvent SocketModuleChanged = new SocketModuleChangedEvent();
     #endregion
 
     #region Properties
@@ -112,5 +118,9 @@ public class Orbit : BaseObject
     #endregion
 
     #region Event handlers
+    public void Socket_ModuleChanged(Socket socket, Module module)
+    {
+        SocketModuleChanged.Invoke(this, socket, module);
+    }
     #endregion
 }

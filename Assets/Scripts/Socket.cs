@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(SphereCollider))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -16,6 +18,8 @@ public class Socket : MonoBehaviour
     #endregion
 
     #region Classes
+    [Serializable]
+    public class ModuleChangedEvent : UnityEvent<Socket, Module> { }
     #endregion
 
     #region Fiedls
@@ -29,6 +33,7 @@ public class Socket : MonoBehaviour
     #endregion
 
     #region Events
+    public ModuleChangedEvent ModuleChanged = new ModuleChangedEvent();
     #endregion
 
     #region Properties
@@ -60,6 +65,8 @@ public class Socket : MonoBehaviour
         _collider.enabled = false;
         _renderer.enabled = false;
 
+        ModuleChanged.Invoke(this, module);
+
         return true;
     }
 
@@ -70,6 +77,8 @@ public class Socket : MonoBehaviour
 
         _collider.enabled = true;
         _renderer.enabled = true;
+
+        ModuleChanged.Invoke(this, null);
     }
     #endregion
 

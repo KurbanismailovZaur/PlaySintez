@@ -52,6 +52,9 @@ public class Star : BaseObject
 
     [Serializable]
     public class LevelIncrementedEvent : UnityEvent<byte> { }
+
+    [Serializable]
+    public class OrbitSocketModuleChagedEvent : UnityEvent<Star, Orbit, Socket, Module> { }
     #endregion
 
     #region Fiedls
@@ -84,6 +87,7 @@ public class Star : BaseObject
     #region Events
     public StateChangedEvent StateChanged;
     public LevelIncrementedEvent LevelIncremented;
+    public OrbitSocketModuleChagedEvent OrbitSocketModuleChanged;
     #endregion
 
     #region Properties
@@ -177,8 +181,11 @@ public class Star : BaseObject
         Orbit.Factory orbitFactory = new Orbit.Factory();
         Orbit orbit = orbitFactory.Create(radius);
 
+        orbit.SocketModuleChanged.AddListener(Orbit_SocketModuleChanged);
+
         orbit.transform.SetParent(_orbitsContainer, false);
         _orbits.Add(orbit);
+
     }
 
     public State GetState()
@@ -294,6 +301,11 @@ public class Star : BaseObject
     public void InformationController_PutModuleInInventory()
     {
         PutCurrentSelectedModuleInInventory();
+    }
+
+    public void Orbit_SocketModuleChanged(Orbit orbit, Socket socket, Module module)
+    {
+        OrbitSocketModuleChanged.Invoke(this, orbit, socket, module);
     }
     #endregion
 }

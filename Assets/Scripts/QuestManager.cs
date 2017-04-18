@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
+using System;
+using UnityEngine.Events;
 
-public class QuestManager : Singleton<QuestManager> 
+public class QuestManager : Singleton<QuestManager>
 {
     #region Enums
     #endregion
@@ -18,6 +20,10 @@ public class QuestManager : Singleton<QuestManager>
     #endregion
 
     #region Fiedls
+    private int _currentTaskIndex;
+
+    private List<Action> _tasks = new List<Action>();
+
     [SerializeField]
     private InventoryController _inventory;
 
@@ -25,7 +31,12 @@ public class QuestManager : Singleton<QuestManager>
     private EmulationController _emulation;
 
     [SerializeField]
-    private TaskController _task;
+    private TaskController _taskController;
+
+    #region Dependencies
+    [SerializeField]
+    private Star _star;
+    #endregion
     #endregion
 
     #region Events
@@ -34,23 +45,75 @@ public class QuestManager : Singleton<QuestManager>
     #region Properties
     #endregion
 
-	#region Constructors
-	#endregion
-	
-    #region Methods
+    #region Constructors
     #endregion
 
-    #region Event handlers
-    public void Star_LevelIncremented(byte level)
+    #region Methods
+    private void AddTask(Action task)
     {
-        if (level == 1)
+        _tasks.Add(task);
+    }
+
+    private void Start()
+    {
+        #region Tasks
+        // 0
+        AddTask(() =>
+        {
+            UnityAction<byte> action = null;
+            action = new UnityAction<byte>((byte level) =>
+            {
+                if (level == 1)
+                {
+                    _star.LevelIncremented.RemoveListener(action);
+                    PerformCurrentTask();
+                }
+            });
+
+            _star.LevelIncremented.AddListener(action);
+        });
+
+        // 1
+        AddTask(() =>
         {
             Capsule lookCapsule = Instantiate(Resources.Load<Capsule>("Inventory/InventoryModules/LookCapsule"));
             _inventory.AddElement(lookCapsule);
 
             _emulation.SetInteractableState(false);
-            _task.SetTaskDescription("Set capsule to socket");
-        }
+            _taskController.SetTaskDescription("Set capsule to socket");
+
+            UnityAction<Star, Orbit, Socket, Module> action = null;
+            action = new UnityAction<Star, Orbit, Socket, Module>((star, orb, soc, mod) =>
+            {
+                _star.OrbitSocketModuleChanged.RemoveListener(action);
+                PerformCurrentTask();
+            });
+
+            _star.OrbitSocketModuleChanged.AddListener(action);
+        });
+
+        // 2
+        AddTask(() =>
+        {
+            _taskController.SetTaskDescription("Earn neseccary energy");
+        });
+        #endregion
+
+        PerformCurrentTask();
     }
+
+    private void PerformCurrentTask()
+    {
+        if (_currentTaskIndex >= _tasks.Count)
+        {
+            Debug.LogErrorFormat("Task with index {0} is not exist", _currentTaskIndex);
+            return;
+        }
+
+        _tasks[_currentTaskIndex++].Invoke();
+    }
+    #endregion
+
+    #region Event handlers
     #endregion
 }
