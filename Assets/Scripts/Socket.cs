@@ -20,6 +20,9 @@ public class Socket : MonoBehaviour
     #region Classes
     [Serializable]
     public class ModuleChangedEvent : UnityEvent<Socket, Module> { }
+
+    [Serializable]
+    public class StateChangedEvent : UnityEvent<Socket> { }
     #endregion
 
     #region Fiedls
@@ -34,6 +37,7 @@ public class Socket : MonoBehaviour
 
     #region Events
     public ModuleChangedEvent ModuleChanged = new ModuleChangedEvent();
+    public StateChangedEvent StateChanged;
     #endregion
 
     #region Properties
@@ -79,6 +83,19 @@ public class Socket : MonoBehaviour
         _renderer.enabled = true;
 
         ModuleChanged.Invoke(this, null);
+    }
+
+    public void SendLevelProgressIncreasingToModule()
+    {
+        if (_connectedModule != null)
+        {
+            ILevelable levelable = _connectedModule as ILevelable;
+
+            if (levelable != null)
+            {
+                levelable.IncreaseLevelProgress();
+            }
+        }
     }
     #endregion
 

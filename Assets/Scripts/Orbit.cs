@@ -21,10 +21,6 @@ public class Orbit : BaseObject
     #endregion
 
     #region Structs
-    public struct State
-    {
-
-    }
     #endregion
 
     #region Classes
@@ -49,18 +45,21 @@ public class Orbit : BaseObject
             
             Transform socketPrefab = Resources.Load<Transform>("Socket/Socket");
 
-            orbit._socketCount = UnityEngine.Random.Range(1, orbit._maxSocketCount);
-            orbit._distanceBetweenSockets = 1f / orbit._socketCount;
+            int socketCount = UnityEngine.Random.Range(1, orbit._maxSocketCount);
+            orbit._distanceBetweenSockets = 1f / socketCount;
 
-            for (int i = 0; i < orbit._socketCount; i++)
+            for (int i = 0; i < socketCount; i++)
             {
-                Transform socket = Instantiate(socketPrefab, orbit.transform, false);
+                Transform socketTransform = Instantiate(socketPrefab, orbit.transform, false);
                 Vector3 pos = orbitLine.GetPoint3D01(orbit._distanceBetweenSockets * i);
-                socket.position = pos;
+                socketTransform.position = pos;
 
-                socket.rotation = Quaternion.LookRotation(pos - orbit.transform.position);
+                socketTransform.rotation = Quaternion.LookRotation(pos - orbit.transform.position);
 
-                socket.GetComponent<Socket>().ModuleChanged.AddListener(orbit.Socket_ModuleChanged);
+                Socket socket = socketTransform.GetComponent<Socket>();
+                socket.ModuleChanged.AddListener(orbit.Socket_ModuleChanged);
+
+                orbit._sockets.Add(socket);
             }
 
             orbitLine.drawTransform = orbit.transform;
@@ -75,7 +74,7 @@ public class Orbit : BaseObject
     }
 
     [Serializable]
-    public class StateChangedEvent : UnityEvent<State> { }
+    public class StateChangedEvent : UnityEvent<Orbit> { }
 
     [SerializeField]
     public class SocketModuleChangedEvent : UnityEvent<Orbit, Socket, Module> { }
@@ -88,12 +87,16 @@ public class Orbit : BaseObject
     private float _radius;
 
     private int _maxSocketCount;
-    private int _socketCount;
     private float _distanceBetweenSockets;
+
+    private byte _level;
+    private float _levelProgress;
+
+    private List<Socket> _sockets = new List<Socket>();
     #endregion
 
     #region Events
-    public StateChangedEvent StateChanged;
+    public StateChangedEvent StateChanged = new StateChangedEvent();
     public SocketModuleChangedEvent SocketModuleChanged = new SocketModuleChangedEvent();
     #endregion
 
@@ -106,14 +109,41 @@ public class Orbit : BaseObject
     #endregion
 
     #region Methods
-    public State GetState()
-    {
-        return new State();
-    }
-
     private void Update()
     {
         transform.Rotate(Vector3.up, 1f / (_radius / 4f) * Time.deltaTime);
+    }
+
+    public void IncreaseLevelProgress()
+    {
+        _levelProgress += 1f / Mathf.Pow(_level + 1, 1.75f);
+
+        StateChanged.Invoke(this);
+
+        if (_levelProgress >= 1f)
+        {
+            LevelUpOrbit();
+        }
+
+        SendLevelProgressIncreasingToAllSockets();
+    }
+
+    private void LevelUpOrbit()
+    {
+        _levelProgress = 0f;
+        _level += 1;
+
+        StateChanged.Invoke(this);
+
+        SendLevelProgressIncreasingToAllSockets();
+    }
+
+    private void SendLevelProgressIncreasingToAllSockets()
+    {
+        foreach (Socket socket in _sockets)
+        {
+            socket.SendLevelProgressIncreasingToModule();
+        }
     }
     #endregion
 

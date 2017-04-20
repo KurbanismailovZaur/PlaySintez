@@ -95,6 +95,7 @@ public class QuestManager : Singleton<QuestManager>
         // 2
         AddTask(() =>
         {
+            _emulation.SetInteractableState(true);
             _taskController.SetTaskDescription("Earn neseccary energy");
         });
         #endregion

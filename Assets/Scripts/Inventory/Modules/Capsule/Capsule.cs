@@ -26,6 +26,9 @@ namespace Inventory
         private int _capacity = 32;
         private int _energy;
 
+        private byte _level;
+        private float _levelProgress;
+
         private bool _isInitialized;
         #endregion
 
@@ -35,6 +38,8 @@ namespace Inventory
         #region Properties
         public int Capacity { get { return _capacity; } }
         public int Energy { get { return _energy; } }
+        public byte Level { get { return _level; } }
+        public float LevelProgress { get { return _levelProgress; } }
         #endregion
 
         #region Constructors
@@ -55,6 +60,9 @@ namespace Inventory
 
             _capacity = capsule.Capacity;
             _energy = capsule.Energy;
+
+            _level = capsule.Level;
+            _levelProgress = capsule.LevelProgress;
 
             _isInitialized = true;
         }

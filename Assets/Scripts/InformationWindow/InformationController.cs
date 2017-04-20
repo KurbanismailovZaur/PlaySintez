@@ -174,7 +174,7 @@ namespace InformationWindow
                     _trackedInformationWindow = _starInformation.gameObject;
                     _trackedInformationWindow.SetActive(true);
 
-                    UpdateInformationAboutStar(star.GetState());
+                    UpdateInformationAboutStar(star);
                     break;
                 case BaseObject.ObjectType.Orbit:
                     Orbit orbit = _trackedObject.GetComponent<Orbit>();
@@ -183,7 +183,7 @@ namespace InformationWindow
                     _trackedInformationWindow = _orbitInformation.gameObject;
                     _trackedInformationWindow.SetActive(true);
 
-                    UpdateInformationAboutOrbit(orbit.GetState());
+                    UpdateInformationAboutOrbit(orbit);
                     break;
                 case BaseObject.ObjectType.Module:
                     Module module = _trackedObject.GetComponent<Module>();
@@ -210,14 +210,14 @@ namespace InformationWindow
             }
         }
 
-        private void UpdateInformationAboutStar(Star.State state)
+        private void UpdateInformationAboutStar(Star star)
         {
-            _starInformation.UpdateInformationAboutStar(state);
+            _starInformation.UpdateInformationAboutStar(star);
         }
 
-        private void UpdateInformationAboutOrbit(Orbit.State state)
+        private void UpdateInformationAboutOrbit(Orbit orbit)
         {
-            _orbitInformation.UpdateInformationAboutOrbit(state);
+            _orbitInformation.UpdateInformationAboutOrbit(orbit);
         }
 
         private void UpdateInformationAboutCapsule(Modules.Capsule capsule)
@@ -238,14 +238,14 @@ namespace InformationWindow
         }
 
         #region BaseObject state changed handlers
-        private void Star_StateChanged(Star.State state)
+        private void Star_StateChanged(Star star)
         {
-            UpdateInformationAboutStar(state);
+            UpdateInformationAboutStar(star);
         }
 
-        private void Orbit_StateChanged(Orbit.State state)
+        private void Orbit_StateChanged(Orbit orbit)
         {
-            UpdateInformationAboutOrbit(state);
+            UpdateInformationAboutOrbit(orbit);
         }
 
         private void Capsule_StateChanged(Modules.Capsule capsule)

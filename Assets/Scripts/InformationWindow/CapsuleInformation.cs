@@ -28,6 +28,12 @@ namespace InformationWindow
 
         [SerializeField]
         private Text _energyText;
+
+        [SerializeField]
+        private Text _levelText;
+
+        [SerializeField]
+        private Text _levelProgressText;
         #endregion
 
         #region Events
@@ -45,6 +51,8 @@ namespace InformationWindow
             _energyTypeText.text = capsule.CapsuleEnergyType.ToString();
             _capacityText.text = capsule.Capacity.ToString();
             _energyText.text = capsule.Energy.ToString();
+            _levelText.text = capsule.Level.ToString();
+            _levelProgressText.text = capsule.LevelProgress.ToString();
         }
         #endregion
 

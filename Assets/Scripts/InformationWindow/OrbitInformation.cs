@@ -31,7 +31,7 @@ namespace InformationWindow
         #endregion
 
         #region Methods
-        public void UpdateInformationAboutOrbit(Orbit.State state)
+        public void UpdateInformationAboutOrbit(Orbit orbit)
         {
 
         }

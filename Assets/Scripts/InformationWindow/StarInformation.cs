@@ -43,13 +43,13 @@ namespace InformationWindow
         #endregion
 
         #region Methods
-        public void UpdateInformationAboutStar(Star.State state)
+        public void UpdateInformationAboutStar(Star star)
         {
-            _energyValueText.text = state.Energy.ToString();
-            _energyProgressValueText.text = string.Format("{0:F}", state.EnergyProgress);
+            _energyValueText.text = star.Energy.ToString();
+            _energyProgressValueText.text = string.Format("{0:F}", star.EnergyProgress);
 
-            _levelValueText.text = state.Level.ToString();
-            _levelProgressValueText.text = string.Format("{0:F}", state.LevelProgress);
+            _levelValueText.text = star.Level.ToString();
+            _levelProgressValueText.text = string.Format("{0:F}", star.LevelProgress);
         }
         #endregion
 

@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace Modules
 {
-    public class Capsule : Module
+    public class Capsule : Module, ILevelable
     {
         #region Enums
         public enum EnergyType
@@ -36,6 +36,9 @@ namespace Modules
         private int _energy;
 
         private bool _isInitialized;
+
+        private byte _level;
+        private float _levelProgress;
         #endregion
 
         #region Events
@@ -44,8 +47,11 @@ namespace Modules
 
         #region Properties
         public EnergyType CapsuleEnergyType { get { return _energyType; } }
+
         public int Capacity { get { return _capacity; } }
         public int Energy { get { return _energy; } }
+        public byte Level { get { return _level; } }
+        public float LevelProgress { get { return _levelProgress; } }
         #endregion
 
         #region Constructors
@@ -62,7 +68,30 @@ namespace Modules
             _capacity = capsule.Capacity;
             _energy = capsule.Energy;
 
+            _level = capsule.Level;
+            _levelProgress = capsule.LevelProgress;
+
             _isInitialized = true;
+        }
+
+        public void IncreaseLevelProgress()
+        {
+            _levelProgress += 1f / Mathf.Pow(_level + 1, 1.5f);
+
+            StateChanged.Invoke(this);
+
+            if (_levelProgress >= 1f)
+            {
+                LevelUpCapsule();
+            }
+        }
+
+        private void LevelUpCapsule()
+        {
+            _levelProgress = 0f;
+            _level += 1;
+
+            StateChanged.Invoke(this);
         }
         #endregion
 

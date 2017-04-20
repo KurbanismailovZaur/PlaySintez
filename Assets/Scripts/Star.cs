@@ -23,32 +23,11 @@ public class Star : BaseObject
         [ColorUsage(false, true, 0f, 1f, 0.125f, 3)]
         public Color emissionColor;
     }
-
-    public struct State
-    {
-        private byte _energy;
-        private float _energyProgress;
-        private byte _level;
-        private float _levelProgress;
-
-        public byte Energy { get { return _energy; } }
-        public float EnergyProgress { get { return _energyProgress; } }
-        public byte Level { get { return _level; } }
-        public float LevelProgress { get { return _levelProgress; } }
-
-        public State(byte energy, float energyProgress, byte level, float levelProgress)
-        {
-            _energy = energy;
-            _energyProgress = energyProgress;
-            _level = level;
-            _levelProgress = levelProgress;
-        }
-    }
     #endregion
 
     #region Classes
     [Serializable]
-    public class StateChangedEvent : UnityEvent<State> { }
+    public class StateChangedEvent : UnityEvent<Star> { }
 
     [Serializable]
     public class LevelIncrementedEvent : UnityEvent<byte> { }
@@ -122,7 +101,7 @@ public class Star : BaseObject
     {
         _energyProgress += 1f / Mathf.Pow(_energy + 1, 2);
 
-        StateChanged.Invoke(GetState());
+        StateChanged.Invoke(this);
 
         if (_energyProgress >= 1f)
         {
@@ -145,7 +124,7 @@ public class Star : BaseObject
         _material.DOColor(_colorsPerEnergy[index].color, "_Color", _animationDuration).Play();
         _material.DOColor(_colorsPerEnergy[index].emissionColor, "_EmissionColor", _animationDuration).Play();
 
-        StateChanged.Invoke(GetState());
+        StateChanged.Invoke(this);
     }
 
     private void IncreaseStarLevelProgress()
@@ -157,11 +136,21 @@ public class Star : BaseObject
 
         _levelProgress += 1f / Mathf.Pow(_level + 1, 2);
 
-        StateChanged.Invoke(GetState());
+        StateChanged.Invoke(this);
 
         if (_levelProgress >= 1f)
         {
             LevelUpStar();
+        }
+
+        SendLevelProgressIncreasingToAllOrbits();
+    }
+
+    private void SendLevelProgressIncreasingToAllOrbits()
+    {
+        foreach (Orbit orbit in _orbits)
+        {
+            orbit.IncreaseLevelProgress();
         }
     }
 
@@ -172,7 +161,7 @@ public class Star : BaseObject
 
         CreateNewOrbit(_level + 1);
 
-        StateChanged.Invoke(GetState());
+        StateChanged.Invoke(this);
         LevelIncremented.Invoke(_level);
     }
 
@@ -186,11 +175,6 @@ public class Star : BaseObject
         orbit.transform.SetParent(_orbitsContainer, false);
         _orbits.Add(orbit);
 
-    }
-
-    public State GetState()
-    {
-        return new State(_energy, _energyProgress, _level, _levelProgress);
     }
 
     private void InstallModuleFromInventory(Inventory.Element element, Vector2 screenPosition)
@@ -212,32 +196,9 @@ public class Star : BaseObject
             return;
         }
 
-        switch (element.GetModuleType())
-        {
-            case Inventory.Element.ModuleType.LookCapsule:
-                InstallCapsule("Modules/RCapsule/RCapsule", element, socket);
-                break;
-            case Inventory.Element.ModuleType.CommentCapsule:
-                InstallCapsule("Modules/GCapsule/GCapsule", element, socket);
-                break;
-            case Inventory.Element.ModuleType.LikeCapsule:
-                InstallCapsule("Modules/BCapsule/BCapsule", element, socket);
-                break;
-            case Inventory.Element.ModuleType.Base:
-                print("Base");
-                break;
-            case Inventory.Element.ModuleType.ResearchCenter:
-                print("ResearchCenter");
-                break;
-        }
-    }
+        Module module = Converter.Instance.ConvertToModule(element);
 
-    private void InstallCapsule(string pathToPrefab, Inventory.Element element, Socket socket)
-    {
-        Modules.Capsule capsule = Instantiate(Resources.Load<Modules.Capsule>(pathToPrefab));
-        capsule.Initialize((Inventory.Capsule)element);
-
-        if (socket.InstallModule(capsule))
+        if (socket.InstallModule(module))
         {
             _inventoryController.RemoveElement(element);
         }
