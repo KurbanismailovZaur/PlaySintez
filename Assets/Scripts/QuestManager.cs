@@ -96,6 +96,19 @@ public class QuestManager : Singleton<QuestManager>
         AddTask(() =>
         {
             _emulation.SetInteractableState(true);
+
+            Modules.Capsule capsule = FindObjectOfType<Modules.Capsule>();
+
+            Action<Modules.Capsule> levelUpedHandler = null;
+            levelUpedHandler = (c) =>
+            {
+                capsule.LevelUped.RemoveListener(new UnityAction<Modules.Capsule>(levelUpedHandler));
+
+                capsule.Socket.SocketOrbit.LevelUpOrbit();
+                _star.LevelUpStar();
+            };
+
+            capsule.LevelUped.AddListener(new UnityAction<Modules.Capsule>(levelUpedHandler));
             _taskController.SetTaskDescription("Earn neseccary energy");
         });
         #endregion

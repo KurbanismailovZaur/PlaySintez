@@ -117,7 +117,7 @@ public class Star : BaseObject
 
         if (_energy == 1)
         {
-            IncreaseStarLevelProgress();
+            LevelUpStar();
         }
 
         int index = Mathf.Clamp(_energy, 0, _colorsPerEnergy.Length - 1);
@@ -134,7 +134,7 @@ public class Star : BaseObject
             return;
         }
 
-        _levelProgress += 1f / Mathf.Pow(_level + 1, 2);
+        _levelProgress += 1f / Mathf.Pow(_level + 2, 2);
 
         StateChanged.Invoke(this);
 
@@ -148,13 +148,16 @@ public class Star : BaseObject
 
     private void SendLevelProgressIncreasingToAllOrbits()
     {
-        foreach (Orbit orbit in _orbits)
+        List<Orbit> orbits = new List<Orbit>();
+        orbits.AddRange(_orbits);
+
+        foreach (Orbit orbit in orbits)
         {
             orbit.IncreaseLevelProgress();
         }
     }
 
-    private void LevelUpStar()
+    public void LevelUpStar()
     {
         _levelProgress = 0f;
         _level += 1;

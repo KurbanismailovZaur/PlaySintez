@@ -57,6 +57,7 @@ public class Orbit : BaseObject
                 socketTransform.rotation = Quaternion.LookRotation(pos - orbit.transform.position);
 
                 Socket socket = socketTransform.GetComponent<Socket>();
+                socket.SetOrbit(orbit);
                 socket.ModuleChanged.AddListener(orbit.Socket_ModuleChanged);
 
                 orbit._sockets.Add(socket);
@@ -116,7 +117,7 @@ public class Orbit : BaseObject
 
     public void IncreaseLevelProgress()
     {
-        _levelProgress += 1f / Mathf.Pow(_level + 1, 1.75f);
+        _levelProgress += 1f / Mathf.Pow(_level + 2, 1.75f);
 
         StateChanged.Invoke(this);
 
@@ -128,7 +129,7 @@ public class Orbit : BaseObject
         SendLevelProgressIncreasingToAllSockets();
     }
 
-    private void LevelUpOrbit()
+    public void LevelUpOrbit()
     {
         _levelProgress = 0f;
         _level += 1;

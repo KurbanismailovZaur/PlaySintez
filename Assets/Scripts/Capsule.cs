@@ -26,6 +26,9 @@ namespace Modules
         #region Classes
         [Serializable]
         public class StateChangedEvent : UnityEvent<Capsule> { }
+
+        [Serializable]
+        public class LevelUpedEvent : UnityEvent<Capsule> { }
         #endregion
 
         #region Fiedls
@@ -43,6 +46,7 @@ namespace Modules
 
         #region Events
         public StateChangedEvent StateChanged;
+        public LevelUpedEvent LevelUped;
         #endregion
 
         #region Properties
@@ -76,7 +80,7 @@ namespace Modules
 
         public void IncreaseLevelProgress()
         {
-            _levelProgress += 1f / Mathf.Pow(_level + 1, 1.5f);
+            _levelProgress += 1f / Mathf.Pow(_level + 2, 1.5f);
 
             StateChanged.Invoke(this);
 
@@ -92,6 +96,7 @@ namespace Modules
             _level += 1;
 
             StateChanged.Invoke(this);
+            LevelUped.Invoke(this);
         }
         #endregion
 

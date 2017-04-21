@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 [RequireComponent(typeof(SphereCollider))]
 [RequireComponent(typeof(MeshRenderer))]
-public class Socket : MonoBehaviour 
+public class Socket : MonoBehaviour
 {
     #region Enums
     #endregion
@@ -26,6 +26,8 @@ public class Socket : MonoBehaviour
     #endregion
 
     #region Fiedls
+    private Orbit _orbit;
+
     private SphereCollider _collider;
     private MeshRenderer _renderer;
 
@@ -33,6 +35,7 @@ public class Socket : MonoBehaviour
     private BaseObject _connectedModule;
 
     private bool _isEmpty = true;
+    private bool _isInitialized;
     #endregion
 
     #region Events
@@ -41,6 +44,7 @@ public class Socket : MonoBehaviour
     #endregion
 
     #region Properties
+    public Orbit SocketOrbit { get { return _orbit; } }
     #endregion
 
     #region Constructors
@@ -95,6 +99,18 @@ public class Socket : MonoBehaviour
             {
                 levelable.IncreaseLevelProgress();
             }
+        }
+    }
+
+    public void SetOrbit(Orbit orbit)
+    {
+        if (!_isInitialized)
+        {
+            _orbit = orbit;
+        }
+        else
+        {
+            Debug.LogError("Orbit already initialized");
         }
     }
     #endregion
