@@ -178,5 +178,13 @@ public class SelectionManager : Singleton<SelectionManager>
     {
         SelectFromScreen(mouseInfo.IsMouseInViewport, mouseInfo.Position);
     }
+
+    public void Star_ModuleRemoved(Module module)
+    {
+        if (_selected == module)
+        {
+            Selected = null;
+        }
+    }
     #endregion
 }

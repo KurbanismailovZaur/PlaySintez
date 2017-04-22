@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using System;
 using UnityEngine.Events;
+using System.Linq;
 
 [RequireComponent(typeof(MeshRenderer))]
 public class Star : BaseObject
@@ -34,6 +35,9 @@ public class Star : BaseObject
 
     [Serializable]
     public class OrbitSocketModuleChagedEvent : UnityEvent<Star, Orbit, Socket, Module> { }
+
+    [Serializable]
+    public class ModuleRemovedEvent : UnityEvent<Module> { }
     #endregion
 
     #region Fiedls
@@ -67,6 +71,7 @@ public class Star : BaseObject
     public StateChangedEvent StateChanged;
     public LevelIncrementedEvent LevelIncremented;
     public OrbitSocketModuleChagedEvent OrbitSocketModuleChanged;
+    public ModuleRemovedEvent moduleRemoved;
     #endregion
 
     #region Properties
@@ -171,7 +176,7 @@ public class Star : BaseObject
     private void CreateNewOrbit(float radius)
     {
         Orbit.Factory orbitFactory = new Orbit.Factory();
-        Orbit orbit = orbitFactory.Create(radius);
+        Orbit orbit = orbitFactory.Create(this, radius);
 
         orbit.SocketModuleChanged.AddListener(Orbit_SocketModuleChanged);
 
@@ -199,6 +204,44 @@ public class Star : BaseObject
             return;
         }
 
+        Orbit.PrefixType? orbitLastPrefixType = null;
+
+        if (socket.SocketOrbit.Prefixes.Count != 0)
+        {
+            orbitLastPrefixType = socket.SocketOrbit.Prefixes.Last();
+        }
+
+        if (orbitLastPrefixType.HasValue && orbitLastPrefixType != Orbit.PrefixType.A)
+        {
+            switch (element.GetModuleType())
+            {
+                case Inventory.Element.ModuleType.LookCapsule:
+                    if (orbitLastPrefixType != Orbit.PrefixType.R)
+                    {
+                        return;
+                    }
+
+                    break;
+                case Inventory.Element.ModuleType.CommentCapsule:
+                    if (orbitLastPrefixType != Orbit.PrefixType.G)
+                    {
+                        return;
+                    }
+
+                    break;
+                case Inventory.Element.ModuleType.LikeCapsule:
+                    if (orbitLastPrefixType != Orbit.PrefixType.B)
+                    {
+                        return;
+                    }
+
+                    break;
+                case Inventory.Element.ModuleType.Base:
+                case Inventory.Element.ModuleType.ResearchCenter:
+                    return;
+            }
+        }
+
         Module module = Converter.Instance.ConvertToModule(element);
 
         if (socket.InstallModule(module))
@@ -223,8 +266,11 @@ public class Star : BaseObject
             return;
         }
 
-        Module module = (Module)baseObject;
+        PutModuleInInventory((Module)baseObject);
+    }
 
+    public void PutModuleInInventory(Module module)
+    {
         switch (module.ModuleType)
         {
             case Module.Type.LookCapsule:
@@ -242,7 +288,7 @@ public class Star : BaseObject
                 break;
         }
 
-        SelectionManager.Instance.Selected = null;
+        moduleRemoved.Invoke(module);
     }
 
     private void MoveCapsuleToInventory(Module module, string pathToInventoryElement)

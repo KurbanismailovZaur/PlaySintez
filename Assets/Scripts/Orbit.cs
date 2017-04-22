@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Vectrosity;
+using System.Linq;
 
 public class Orbit : BaseObject
 {
@@ -26,9 +27,10 @@ public class Orbit : BaseObject
     #region Classes
     public class Factory
     {
-        public Orbit Create(float radius, PrefixType? prefix = null)
+        public Orbit Create(Star star, float radius)
         {
             Orbit orbit = new GameObject("Orbit").AddComponent<Orbit>();
+            orbit._star = star;
             orbit.BaseObjectType = ObjectType.Orbit;
             orbit._radius = radius;
             orbit._maxSocketCount = (int)radius * 2;
@@ -37,12 +39,13 @@ public class Orbit : BaseObject
             VectorLine orbitLine = new VectorLine("OrbitLine", new List<Vector3>(orbitSegmentsCount + 1), 1f);
             orbitLine.lineType = LineType.Continuous;
             orbitLine.MakeCircle(Vector3.zero, Vector3.up, orbit._radius, orbitSegmentsCount);
-            orbit._prefix = prefix ?? (PrefixType)UnityEngine.Random.Range(0, 3);
 
             Material lineMaterial = new Material(Shader.Find("Unlit/Color"));
             lineMaterial.color = new Color32(128, 128, 128, 255);
+
+            orbit._lineMaterial = lineMaterial;
             orbitLine.material = lineMaterial;
-            
+
             Transform socketPrefab = Resources.Load<Transform>("Socket/Socket");
 
             int socketCount = UnityEngine.Random.Range(1, orbit._maxSocketCount);
@@ -82,16 +85,23 @@ public class Orbit : BaseObject
     #endregion
 
     #region Fiedls
-    private PrefixType _prefix;
+    private Star _star;
+
+    private List<PrefixType> _prefixes = new List<PrefixType>();
     private VectorLine _line;
 
     private float _radius;
+
+    private Material _lineMaterial;
 
     private int _maxSocketCount;
     private float _distanceBetweenSockets;
 
     private byte _level;
-    private float _levelProgress;
+    private float _lookLevelProgress;
+    private float _commentLevelProgress;
+    private float _likeLevelProgress;
+    private float _whiteLevelProgress;
 
     private List<Socket> _sockets = new List<Socket>();
     #endregion
@@ -102,7 +112,7 @@ public class Orbit : BaseObject
     #endregion
 
     #region Properties
-    public PrefixType Prefix { get { return _prefix; } }
+    public List<PrefixType> Prefixes { get { return _prefixes; } }
     public VectorLine Line { get { return _line; } }
     #endregion
 
@@ -117,11 +127,42 @@ public class Orbit : BaseObject
 
     public void IncreaseLevelProgress()
     {
-        _levelProgress += 1f / Mathf.Pow(_level + 2, 1.75f);
+        foreach (Socket socket in _sockets)
+        {
+            Modules.Capsule capsule = socket.ConnectedModule as Modules.Capsule;
+
+            if (capsule != null)
+            {
+                float bonus = 0;
+
+                switch (capsule.CapsuleEnergyType)
+                {
+                    case Modules.Capsule.EnergyType.Look:
+                        bonus = _prefixes.FindAll(x => x == PrefixType.R).Count + 1;
+                        _lookLevelProgress += (1f / Mathf.Pow(_level + 2, 1.75f)) * bonus;
+                        break;
+                    case Modules.Capsule.EnergyType.Comment:
+                        bonus = _prefixes.FindAll(x => x == PrefixType.G).Count + 1;
+                        _commentLevelProgress += 1f / Mathf.Pow(_level + 2, 1.75f) * bonus;
+                        break;
+                    case Modules.Capsule.EnergyType.Like:
+                        bonus = _prefixes.FindAll(x => x == PrefixType.B).Count + 1;
+                        _likeLevelProgress += 1f / Mathf.Pow(_level + 2, 1.75f) * bonus;
+                        break;
+                }
+            }
+            else if (socket.ConnectedModule != null)
+            {
+                float bonus = _prefixes.FindAll(x => x == PrefixType.A).Count + 1;
+                _whiteLevelProgress += 1f / Mathf.Pow(_level + 2, 1.75f) * bonus;
+            }
+        }
 
         StateChanged.Invoke(this);
 
-        if (_levelProgress >= 1f)
+        float sum = _lookLevelProgress + _commentLevelProgress + _likeLevelProgress + _whiteLevelProgress;
+
+        if (sum >= 1f)
         {
             LevelUpOrbit();
         }
@@ -131,12 +172,69 @@ public class Orbit : BaseObject
 
     public void LevelUpOrbit()
     {
-        _levelProgress = 0f;
+        int prefixNumber = 0;
+
+        if (_level == 0)
+        {
+            List<float> energys = new List<float> { _lookLevelProgress, _commentLevelProgress, _likeLevelProgress, _whiteLevelProgress };
+            float max = energys.Max();
+
+            List<int> indexes = new List<int>();
+            for (int i = 0; i < energys.Count; i++)
+            {
+                if (Mathf.Approximately(energys[i], max))
+                {
+                    indexes.Add(i);
+                }
+            }
+
+            prefixNumber = indexes[UnityEngine.Random.Range(0, indexes.Count)];
+        }
+        else
+        {
+            prefixNumber = UnityEngine.Random.Range(0, 4);
+        }
+
+        PrefixType? lastPrefix = null;
+        if (_prefixes.Count() != 0)
+        {
+            lastPrefix = _prefixes.Last();
+        }
+
+        PrefixType newPrefix = (PrefixType)prefixNumber;
+        _prefixes.Add(newPrefix);
+
+        if (newPrefix != lastPrefix && newPrefix != PrefixType.A)
+        {
+            foreach (Socket socket in _sockets)
+            {
+                if (socket.ConnectedModule != null && socket.ConnectedModule.SuitablePrefix != newPrefix)
+                {
+                    _star.PutModuleInInventory(socket.ConnectedModule);
+                }
+            }
+        }
+
+        switch (_prefixes.Last())
+        {
+            case PrefixType.R:
+                _lineMaterial.color = Color.red;
+                break;
+            case PrefixType.G:
+                _lineMaterial.color = Color.green;
+                break;
+            case PrefixType.B:
+                _lineMaterial.color = Color.blue;
+                break;
+            case PrefixType.A:
+                _lineMaterial.color = Color.white;
+                break;
+        }
+
+        _lookLevelProgress = _commentLevelProgress = _likeLevelProgress = _whiteLevelProgress = 0f;
         _level += 1;
 
         StateChanged.Invoke(this);
-
-        SendLevelProgressIncreasingToAllSockets();
     }
 
     private void SendLevelProgressIncreasingToAllSockets()

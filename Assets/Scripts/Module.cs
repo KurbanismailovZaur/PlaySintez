@@ -29,6 +29,9 @@ public class Module : BaseObject
     #region Fiedls
     [SerializeField]
     private Type _moduleType;
+
+    [SerializeField]
+    Orbit.PrefixType _suitablePrefix;
     #endregion
 
     #region Events
@@ -37,6 +40,7 @@ public class Module : BaseObject
     #region Properties
     public Type ModuleType { get { return _moduleType; } }
     public Socket Socket { get; set; }
+    public Orbit.PrefixType SuitablePrefix { get { return _suitablePrefix; } }
     #endregion
 
     #region Constructors

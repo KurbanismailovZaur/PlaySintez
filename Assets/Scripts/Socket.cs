@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -32,7 +33,7 @@ public class Socket : MonoBehaviour
     private MeshRenderer _renderer;
 
     [SerializeField]
-    private BaseObject _connectedModule;
+    private Module _connectedModule;
 
     private bool _isEmpty = true;
     private bool _isInitialized;
@@ -45,6 +46,7 @@ public class Socket : MonoBehaviour
 
     #region Properties
     public Orbit SocketOrbit { get { return _orbit; } }
+    public Module ConnectedModule { get { return _connectedModule; } }
     #endregion
 
     #region Constructors
