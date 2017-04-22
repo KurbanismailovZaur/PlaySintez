@@ -211,7 +211,7 @@ public class Star : BaseObject
             orbitLastPrefixType = socket.SocketOrbit.Prefixes.Last();
         }
 
-        if (orbitLastPrefixType.HasValue && orbitLastPrefixType != Orbit.PrefixType.A)
+        if (orbitLastPrefixType.HasValue)
         {
             switch (element.GetModuleType())
             {
@@ -236,8 +236,11 @@ public class Star : BaseObject
                     }
 
                     break;
-                case Inventory.Element.ModuleType.Base:
-                case Inventory.Element.ModuleType.ResearchCenter:
+                default:
+                    if (orbitLastPrefixType != Orbit.PrefixType.A)
+                    {
+                        return;
+                    }
                     return;
             }
         }

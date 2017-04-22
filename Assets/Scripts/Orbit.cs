@@ -160,14 +160,14 @@ public class Orbit : BaseObject
 
         StateChanged.Invoke(this);
 
+        SendLevelProgressIncreasingToAllSockets();
+
         float sum = _lookLevelProgress + _commentLevelProgress + _likeLevelProgress + _whiteLevelProgress;
 
         if (sum >= 1f)
         {
             LevelUpOrbit();
         }
-
-        SendLevelProgressIncreasingToAllSockets();
     }
 
     public void LevelUpOrbit()
@@ -204,7 +204,7 @@ public class Orbit : BaseObject
         PrefixType newPrefix = (PrefixType)prefixNumber;
         _prefixes.Add(newPrefix);
 
-        if (newPrefix != lastPrefix && newPrefix != PrefixType.A)
+        if (newPrefix != lastPrefix)
         {
             foreach (Socket socket in _sockets)
             {
