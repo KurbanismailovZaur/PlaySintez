@@ -36,7 +36,7 @@ public class Orbit : BaseObject
             orbit._maxSocketCount = (int)radius * 2;
 
             int orbitSegmentsCount = 64;
-            VectorLine orbitLine = new VectorLine("OrbitLine", new List<Vector3>(orbitSegmentsCount + 1), 1f);
+            VectorLine orbitLine = new VectorLine(string.Format("OrbitLine{0}", star.Level), new List<Vector3>(orbitSegmentsCount + 1), 1f);
             orbitLine.lineType = LineType.Continuous;
             orbitLine.MakeCircle(Vector3.zero, Vector3.up, orbit._radius, orbitSegmentsCount);
 
@@ -49,6 +49,14 @@ public class Orbit : BaseObject
             Transform socketPrefab = Resources.Load<Transform>("Socket/Socket");
 
             int socketCount = UnityEngine.Random.Range(1, orbit._maxSocketCount);
+            if (star.Level == 2)
+            {
+                if (socketCount == 1)
+                {
+                    socketCount = 2;
+                }
+            }
+
             orbit._distanceBetweenSockets = 1f / socketCount;
 
             for (int i = 0; i < socketCount; i++)
@@ -72,6 +80,45 @@ public class Orbit : BaseObject
             orbitLine.Draw3DAuto();
 
             orbit._line = orbitLine;
+
+            if (orbit._sockets.Count > 1)
+            {
+                int maxLinksCount = orbit._sockets.Count / 2;
+                int linksCount = UnityEngine.Random.Range(0, maxLinksCount + 1);
+
+                if (star.Level == 2)
+                {
+                    if (linksCount == 0)
+                    {
+                        linksCount = 1;
+                    }
+                }
+
+                int linkedArkSegmentsCount = orbitSegmentsCount / orbit._sockets.Count;
+
+                for (int i = 0; i < linksCount; i += 2)
+                {
+                    orbit._sockets[i].LinkedSocket = orbit._sockets[i + 1];
+                    orbit._sockets[i + 1].LinkedSocket = orbit._sockets[i];
+
+                    float angleBettwenLinkedSockets = 360f / orbit._sockets.Count;
+                    VectorLine linkedLine = new VectorLine(string.Format("Orbit{0}LinkLine{1}", star.Level, i), new List<Vector3>(linkedArkSegmentsCount * 2), 4f);
+                    linkedLine.lineType = LineType.Discrete;
+                    linkedLine.MakeArc(orbit.transform.position, Vector3.up, radius, radius, i * angleBettwenLinkedSockets, (i + 1) * angleBettwenLinkedSockets, linkedArkSegmentsCount);
+
+                    Material linkedMaterial = new Material(Shader.Find("Unlit/Color"));
+                    linkedMaterial.color = new Color32(255, 255, 0, 255);
+
+                    linkedLine.material = linkedMaterial;
+
+                    linkedLine.drawTransform = orbit.transform;
+                    linkedLine.layer = LayerMask.NameToLayer("Default");
+
+                    linkedLine.Draw3DAuto();
+
+                    orbit._linkedLines.Add(linkedLine);
+                }
+            }
 
             return orbit;
         }
@@ -104,6 +151,7 @@ public class Orbit : BaseObject
     private float _whiteLevelProgress;
 
     private List<Socket> _sockets = new List<Socket>();
+    private List<VectorLine> _linkedLines = new List<VectorLine>();
     #endregion
 
     #region Events

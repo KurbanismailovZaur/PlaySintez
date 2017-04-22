@@ -37,6 +37,7 @@ public class Socket : MonoBehaviour
 
     private bool _isEmpty = true;
     private bool _isInitialized;
+    private Socket _linkedSocket;
     #endregion
 
     #region Events
@@ -47,6 +48,15 @@ public class Socket : MonoBehaviour
     #region Properties
     public Orbit SocketOrbit { get { return _orbit; } }
     public Module ConnectedModule { get { return _connectedModule; } }
+
+    public Socket LinkedSocket
+    {
+        get { return _linkedSocket; }
+        set
+        {
+            _linkedSocket = value;
+        }
+    }
     #endregion
 
     #region Constructors
@@ -109,6 +119,7 @@ public class Socket : MonoBehaviour
         if (!_isInitialized)
         {
             _orbit = orbit;
+            _isInitialized = true;
         }
         else
         {
