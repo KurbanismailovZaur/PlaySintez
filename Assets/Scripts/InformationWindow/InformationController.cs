@@ -44,10 +44,10 @@ namespace InformationWindow
         private CapsuleInformation _capsuleInformation;
 
         [SerializeField]
-        private CapsuleInformation _baseInformation;
+        private BaseInformation _baseInformation;
 
         [SerializeField]
-        private CapsuleInformation _researchCenterInformation;
+        private ResearchCenterInformation _researchCenterInformation;
 
         private BaseObject _trackedObject;
         private GameObject _trackedInformationWindow;
@@ -146,8 +146,10 @@ namespace InformationWindow
                                 _trackedObject.GetComponent<Modules.Capsule>().StateChanged.RemoveListener(Capsule_StateChanged);
                                 break;
                             case Module.Type.Base:
+                                _trackedObject.GetComponent<Modules.Base>().StateChanged.RemoveListener(Base_StateChanged);
                                 break;
                             case Module.Type.ResearchCenter:
+                                _trackedObject.GetComponent<Modules.ResearchCenter>().StateChanged.RemoveListener(Base_StateChanged);
                                 break;
                         }
 
@@ -199,8 +201,16 @@ namespace InformationWindow
                             UpdateInformationAboutCapsule(capsule);
                             break;
                         case Module.Type.Base:
+                            _trackedInformationWindow = _baseInformation.gameObject;
+                            Modules.Base baseModule = module.GetComponent<Modules.Base>();
+                            baseModule.StateChanged.AddListener(Base_StateChanged);
+                            UpdateInformationAboutBase(baseModule);
                             break;
                         case Module.Type.ResearchCenter:
+                            _trackedInformationWindow = _researchCenterInformation.gameObject;
+                            Modules.ResearchCenter researchCenter = module.GetComponent<Modules.ResearchCenter>();
+                            researchCenter.StateChanged.AddListener(Base_StateChanged);
+                            UpdateInformationAboutResearchCenter(researchCenter);
                             break;
                     }
                     
@@ -223,6 +233,16 @@ namespace InformationWindow
         private void UpdateInformationAboutCapsule(Modules.Capsule capsule)
         {
             _capsuleInformation.UpdateInformationAboutCapsule(capsule);
+        }
+
+        private void UpdateInformationAboutBase(Modules.Base baseModule)
+        {
+            _baseInformation.UpdateInformationAboutBase(baseModule);
+        }
+
+        private void UpdateInformationAboutResearchCenter(Modules.ResearchCenter researchCenter)
+        {
+            _researchCenterInformation.UpdateInformationAboutResearchCenter(researchCenter);
         }
         #endregion
 
@@ -251,6 +271,16 @@ namespace InformationWindow
         private void Capsule_StateChanged(Modules.Capsule capsule)
         {
             UpdateInformationAboutCapsule(capsule);
+        }
+
+        private void Base_StateChanged(Modules.Base baseModule)
+        {
+            UpdateInformationAboutBase(baseModule);
+        }
+
+        private void ResearchCenter_StateChanged(Modules.ResearchCenter researchCenter)
+        {
+            UpdateInformationAboutResearchCenter(researchCenter);
         }
         #endregion
         #endregion

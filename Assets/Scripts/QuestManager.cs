@@ -109,13 +109,38 @@ public class QuestManager : Singleton<QuestManager>
             levelUpedHandler = (c) =>
             {
                 capsule.LevelUped.RemoveListener(new UnityAction<Modules.Capsule>(levelUpedHandler));
-
-                capsule.Socket.SocketOrbit.LevelUpOrbit();
-                _star.LevelUpStar();
+                PerformCurrentTask();
             };
 
             capsule.LevelUped.AddListener(new UnityAction<Modules.Capsule>(levelUpedHandler));
             _taskController.SetTaskDescription("Earn neseccary energy");
+        });
+
+        AddTask(() =>
+        {
+            Modules.Capsule capsule = FindObjectOfType<Modules.Capsule>();
+
+            capsule.Socket.SocketOrbit.LevelUpOrbit();
+            _star.LevelUpStar();
+
+            Base baseElement = Instantiate(Resources.Load<Base>("Inventory/InventoryModules/Base"));
+            _inventory.AddElement(baseElement);
+
+            _taskController.SetTaskDescription("Link capsule and base module");
+
+            UnityAction<Module, Module> action = null;
+            action = new UnityAction<Module, Module>((x, y) =>
+            {
+                _star.modulesLinked.RemoveListener(action);
+                PerformCurrentTask();
+            });
+
+            _star.modulesLinked.AddListener(action);
+        });
+
+        AddTask(() =>
+        {
+            _taskController.SetTaskDescription("Convert dirty energy to pure");
         });
         #endregion
 

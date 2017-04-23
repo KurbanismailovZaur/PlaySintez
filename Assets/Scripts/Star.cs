@@ -38,6 +38,9 @@ public class Star : BaseObject
 
     [Serializable]
     public class ModuleRemovedEvent : UnityEvent<Module> { }
+
+    [Serializable]
+    public class ModulesLinkedEvent : UnityEvent<Module, Module> { }
     #endregion
 
     #region Fiedls
@@ -72,6 +75,7 @@ public class Star : BaseObject
     public LevelIncrementedEvent LevelIncremented;
     public OrbitSocketModuleChagedEvent OrbitSocketModuleChanged;
     public ModuleRemovedEvent moduleRemoved;
+    public ModulesLinkedEvent modulesLinked;
     #endregion
 
     #region Properties
@@ -250,6 +254,11 @@ public class Star : BaseObject
         if (socket.InstallModule(module))
         {
             _inventoryController.RemoveElement(element);
+
+            if (module.Socket.LinkedSocket != null && module.Socket.LinkedSocket.ConnectedModule != null)
+            {
+                modulesLinked.Invoke(module, module.Socket.LinkedSocket.ConnectedModule);
+            }
         }
     }
 

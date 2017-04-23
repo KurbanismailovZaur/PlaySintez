@@ -32,30 +32,28 @@ public class Converter : Singleton<Converter>
     #region Methods
     public Module ConvertToModule(Element element)
     {
-        Module module = null;
         switch (element.GetModuleType())
         {
-            case Inventory.Element.ModuleType.LookCapsule:
-                module = CreateCapsuleModule("Modules/RCapsule/RCapsule", element);
-                break;
-            case Inventory.Element.ModuleType.CommentCapsule:
-                module = CreateCapsuleModule("Modules/GCapsule/GCapsule", element);
-                break;
-            case Inventory.Element.ModuleType.LikeCapsule:
-                module = CreateCapsuleModule("Modules/BCapsule/BCapsule", element);
-                break;
-            //case Inventory.Element.ModuleType.Base:
-            //    print("Base");
-            //    break;
+            case Element.ModuleType.LookCapsule:
+                return CreateCapsuleModule("Modules/RCapsule/RCapsule", element);
+            case Element.ModuleType.CommentCapsule:
+                return CreateCapsuleModule("Modules/GCapsule/GCapsule", element);
+            case Element.ModuleType.LikeCapsule:
+                return CreateCapsuleModule("Modules/BCapsule/BCapsule", element);
+            case Element.ModuleType.Base:
+                Modules.Base baseModule = Instantiate(Resources.Load<Modules.Base>("Modules/Base/Base"));
+                baseModule.Initialize(element);
+
+                return baseModule;
             //case Inventory.Element.ModuleType.ResearchCenter:
             //    print("ResearchCenter");
             //    break;
         }
 
-        return module;
+        return null;
     }
 
-    private Module CreateCapsuleModule(string pathToPrefab, Inventory.Element element)
+    private Modules.Capsule CreateCapsuleModule(string pathToPrefab, Inventory.Element element)
     {
         Modules.Capsule capsule = Instantiate(Resources.Load<Modules.Capsule>(pathToPrefab));
         capsule.Initialize((Capsule)element);
