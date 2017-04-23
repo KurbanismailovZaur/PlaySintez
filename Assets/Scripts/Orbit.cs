@@ -218,7 +218,7 @@ public class Orbit : BaseObject
         }
     }
 
-    public void LevelUpOrbit()
+    public void LevelUpOrbit(PrefixType? forcePrefix = null)
     {
         int prefixNumber = 0;
 
@@ -249,14 +249,24 @@ public class Orbit : BaseObject
             lastPrefix = _prefixes.Last();
         }
 
-        PrefixType newPrefix = (PrefixType)prefixNumber;
-        _prefixes.Add(newPrefix);
+        PrefixType? newPrefix = null;
+
+        if (forcePrefix == null)
+        {
+            newPrefix = (PrefixType)prefixNumber;
+            _prefixes.Add(newPrefix.Value);
+        }
+        else
+        {
+            newPrefix = forcePrefix;
+            _prefixes.Add(newPrefix.Value);
+        }
 
         if (newPrefix != lastPrefix)
         {
             foreach (Socket socket in _sockets)
             {
-                if (socket.ConnectedModule != null && socket.ConnectedModule.SuitablePrefix != newPrefix)
+                if (socket.ConnectedModule != null && socket.ConnectedModule.SuitablePrefix != newPrefix.Value)
                 {
                     _star.PutModuleInInventory(socket.ConnectedModule);
                 }

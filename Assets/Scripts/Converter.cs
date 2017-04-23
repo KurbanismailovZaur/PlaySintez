@@ -60,6 +60,35 @@ public class Converter : Singleton<Converter>
 
         return capsule;
     }
+
+    public Element ConvertToInventoryElement(Module module)
+    {
+        switch (module.ModuleType)
+        {
+            case Module.Type.LookCapsule:
+                return MoveCapsuleToInventory(module, "Inventory/InventoryModules/LookCapsule");
+            case Module.Type.CommentCapsule:
+                return MoveCapsuleToInventory(module, "Inventory/InventoryModules/CommentCapsule");
+            case Module.Type.LikeCapsule:
+                return MoveCapsuleToInventory(module, "Inventory/InventoryModules/LikeCapsule");
+            case Module.Type.Base:
+                Base baseModule = Instantiate(Resources.Load<Base>("Inventory/InventoryModules/Base"));
+                baseModule.Initialize((Modules.Base)module);
+                return baseModule;
+            case Module.Type.ResearchCenter:
+                break;
+        }
+
+        return null;
+    }
+
+    private Element MoveCapsuleToInventory(Module module, string pathToInventoryElement)
+    {
+        Capsule lookCapsule = Instantiate(Resources.Load<Capsule>(pathToInventoryElement));
+        lookCapsule.Initialize((Modules.Capsule)module);
+
+        return lookCapsule;
+    }
     #endregion
 
     #region Event handlers

@@ -33,6 +33,9 @@ public class QuestManager : Singleton<QuestManager>
     [SerializeField]
     private TaskController _taskController;
 
+    [SerializeField]
+    private BaseInformation _baseInformation;
+
     #region Dependencies
     [SerializeField]
     private Star _star;
@@ -116,6 +119,7 @@ public class QuestManager : Singleton<QuestManager>
             _taskController.SetTaskDescription("Earn neseccary energy");
         });
 
+        // 3
         AddTask(() =>
         {
             Modules.Capsule capsule = FindObjectOfType<Modules.Capsule>();
@@ -138,9 +142,43 @@ public class QuestManager : Singleton<QuestManager>
             _star.modulesLinked.AddListener(action);
         });
 
+        // 4
         AddTask(() =>
         {
+            UnityAction action = null;
+            action = new UnityAction(() =>
+            {
+                _baseInformation.ConvertButton.onClick.RemoveListener(action);
+                PerformCurrentTask();
+            });
+
+            _baseInformation.ConvertButton.onClick.AddListener(action);
+
             _taskController.SetTaskDescription("Convert dirty energy to pure");
+        });
+
+        // 5
+        AddTask(() =>
+        {
+            (SelectionManager.Instance.Selected as Module).Socket.SocketOrbit.LevelUpOrbit(Orbit.PrefixType.A);
+
+            UnityAction<Star, Orbit, Socket, Module> action = null;
+            action = new UnityAction<Star, Orbit, Socket, Module>((star, orb, sock, mod) =>
+            {
+                _star.OrbitSocketModuleChanged.RemoveListener(new UnityAction<Star, Orbit, Socket, Module>(action));
+
+                PerformCurrentTask();
+            });
+
+            _star.OrbitSocketModuleChanged.AddListener(action);
+
+            _taskController.SetTaskDescription("Set capsule to first orbit");
+        });
+
+        // 6
+        AddTask(() =>
+        {
+            _taskController.SetTaskDescription("Collect energy in capsule");
         });
         #endregion
 

@@ -20,12 +20,15 @@ namespace Inventory
         #endregion
 
         #region Fiedls
+        private bool _isInitialized;
+        private int _pureEnergy;
         #endregion
 
         #region Events
         #endregion
 
         #region Properties
+        public int PureEnergy { get { return _pureEnergy; } }
         #endregion
 
         #region Constructors
@@ -35,6 +38,18 @@ namespace Inventory
         public override ModuleType GetModuleType()
         {
             return ModuleType.Base;
+        }
+
+        public void Initialize(Modules.Base baseModule)
+        {
+            if (_isInitialized)
+            {
+                return;
+            }
+
+            _pureEnergy = baseModule.PureEnergy;
+
+            _isInitialized = true;
         }
         #endregion
 

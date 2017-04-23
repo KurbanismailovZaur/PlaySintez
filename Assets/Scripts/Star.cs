@@ -245,7 +245,7 @@ public class Star : BaseObject
                     {
                         return;
                     }
-                    return;
+                    break;
             }
         }
 
@@ -283,34 +283,12 @@ public class Star : BaseObject
 
     public void PutModuleInInventory(Module module)
     {
-        switch (module.ModuleType)
-        {
-            case Module.Type.LookCapsule:
-                MoveCapsuleToInventory(module, "Inventory/InventoryModules/LookCapsule");
-                break;
-            case Module.Type.CommentCapsule:
-                MoveCapsuleToInventory(module, "Inventory/InventoryModules/CommentCapsule");
-                break;
-            case Module.Type.LikeCapsule:
-                MoveCapsuleToInventory(module, "Inventory/InventoryModules/LikeCapsule");
-                break;
-            case Module.Type.Base:
-                break;
-            case Module.Type.ResearchCenter:
-                break;
-        }
+        Inventory.Element element = Converter.Instance.ConvertToInventoryElement(module);
+
+        _inventoryController.AddElement(element);
+        RemoveModule(module);
 
         moduleRemoved.Invoke(module);
-    }
-
-    private void MoveCapsuleToInventory(Module module, string pathToInventoryElement)
-    {
-        Inventory.Capsule lookCapsule = Instantiate(Resources.Load<Inventory.Capsule>(pathToInventoryElement));
-        lookCapsule.Initialize((Modules.Capsule)module);
-
-        _inventoryController.AddElement(lookCapsule);
-
-        RemoveModule(module);
     }
     #endregion
 

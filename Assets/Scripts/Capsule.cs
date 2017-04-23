@@ -53,7 +53,16 @@ namespace Modules
         public EnergyType CapsuleEnergyType { get { return _energyType; } }
 
         public int Capacity { get { return _capacity; } }
-        public int Energy { get { return _energy; } }
+        public int Energy
+        {
+            get { return _energy; }
+            set
+            {
+                _energy = value;
+
+                StateChanged.Invoke(this);
+            }
+        }
         public byte Level { get { return _level; } }
         public float LevelProgress { get { return _levelProgress; } }
         #endregion
@@ -81,6 +90,7 @@ namespace Modules
         public void IncreaseLevelProgress()
         {
             _levelProgress += 1f / Mathf.Pow(_level + 2, 1.5f);
+            _energy = Mathf.Clamp(_energy + 8, 0, _capacity);
 
             StateChanged.Invoke(this);
 
