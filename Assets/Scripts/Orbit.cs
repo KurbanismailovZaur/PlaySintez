@@ -240,7 +240,8 @@ public class Orbit : BaseObject
         }
         else
         {
-            prefixNumber = UnityEngine.Random.Range(0, 4);
+            //prefixNumber = UnityEngine.Random.Range(0, 4);
+            prefixNumber = (int)_sockets.Where(x => x.ConnectedModule != null).First().ConnectedModule.SuitablePrefix;
         }
 
         PrefixType? lastPrefix = null;
